@@ -7,15 +7,12 @@ class MainView extends ui.UI.MainPageUI implements UIBase {
         this.init();
     }
 
-    //public evm:ElementViewManage; 	
-    //private levm: LevelReqViewManage;
-
     public init(): void {
         var Event = Laya.Event;
         //初始化背景颜色
         Laya.stage.bgColor = "#94deec";
         this.btnStart.on(Event.MOUSE_DOWN, this, this.onMouseDown);
-        //this.imgAvatar.loadImage("");
+        this.imgAvatar.loadImage("gameui/brick.png");
 
     }
 

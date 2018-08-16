@@ -14,9 +14,9 @@ enum ResType {
 class ResourceManager {
     public static Instance: ResourceManager;
 
-    private ROBOT_DATA_PATH: string = "res/data/l1.json";
-    private ROBOT_TEXTURE_PATH: string = "res/atlas/gameui.atlas";
-    private ROBOT_IMG_PATH: string = "res/atlas/gameui.png";
+    private DATA_PATH: string = "res/data/l1.json";
+    private UI_TEXTURE_PATH: string = "res/atlas/gameui.atlas";
+    private UI_IMG_PATH: string = "res/atlas/gameui.png";
 
     private resArr: ResBase[] = [];
 
@@ -28,9 +28,9 @@ class ResourceManager {
     public Load(call: Laya.Handler) {
         //资源图集预加载
         let resArray: Array<any> = [];
-        //resArray.push({ url: this.ROBOT_DATA_PATH, type: Laya.Loader.JSON});
-        resArray.push({ url: this.ROBOT_TEXTURE_PATH, type: Laya.Loader.ATLAS });
-        resArray.push({ url: this.ROBOT_IMG_PATH, type: Laya.Loader.IMAGE });
+        //resArray.push({ url: this.DATA_PATH, type: Laya.Loader.JSON});
+        resArray.push({ url: this.UI_TEXTURE_PATH, type: Laya.Loader.ATLAS });
+        resArray.push({ url: this.UI_IMG_PATH, type: Laya.Loader.IMAGE });
         //  需要loading界面的话就在此函数增加一个回调函数
         Laya.loader.load(resArray, call);
 

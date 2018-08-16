@@ -2,55 +2,17 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":6,
+    "selecteID":7,
     "props":{"width":600,"sceneColor":"#959595","height":1000},
     "nodeParent":-1,
     "label":"View",
     "isOpen":true,
-    "isDirectory":true,
+    "isDirectory":false,
     "isAniNode":true,
-    "hasChild":true,
+    "hasChild":false,
     "compId":1,
     "child":[
-        {
-            "x":15,
-            "type":"Image",
-            "props":{"y":200,"x":0,"width":100,"skin":"comp/brick.png","height":100},
-            "nodeParent":1,
-            "label":"Image",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":3,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
-            "type":"Image",
-            "props":{"y":352,"x":56,"width":449,"var":"imgMazeBg","skin":"comp/brick.png","height":373},
-            "nodeParent":1,
-            "label":"Image(imgMazeBg)",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":6,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
-            "type":"Image",
-            "props":{"y":36,"x":36,"width":152,"skin":"comp/image.png","height":134},
-            "nodeParent":1,
-            "label":"Image",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":7,
-            "child":[
-                ]
-        }],
+        ],
     "animations":[
         {
             "nodes":[

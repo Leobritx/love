@@ -25,7 +25,9 @@ var GameView = /** @class */ (function (_super) {
     //private levm: LevelReqViewManage;
     GameView.prototype.init = function () {
         Laya.stage.bgColor = "#959595";
-        this.imgMazeBg.graphics.drawLine(0, 0, 100, 120, "#ffff99", 2);
+        //添加迷宫
+        var maze = new Maze(0, 200, 600, 600);
+        this.addChild(maze);
     };
     //UIBase接口
     GameView.prototype.open = function (obj, call) {
@@ -40,7 +42,6 @@ var GameView = /** @class */ (function (_super) {
     };
     GameView.prototype.hide = function () {
     };
-    //回调后会调用show，用于显示UI时的一些表现
     GameView.prototype.show = function () {
     };
     return GameView;

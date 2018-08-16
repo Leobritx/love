@@ -12,7 +12,10 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
 
     public init(): void {
         Laya.stage.bgColor = "#959595";
-        this.imgMazeBg.graphics.drawLine(0, 0, 100, 120, "#ffff99", 2);
+        
+        //添加迷宫
+        let maze = new Maze(0,200,600,600);
+        this.addChild(maze);        
     }
 
     //UIBase接口
@@ -32,7 +35,6 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
 
     }
 
-    //回调后会调用show，用于显示UI时的一些表现
     public show() {
     }
 

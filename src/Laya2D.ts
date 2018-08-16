@@ -5,7 +5,7 @@ class GameApp {
 
 	constructor() {
 		GameApp.Instance = this;
-		
+
 		//管理器
 		new UIManager();
 		new ResourceManager();

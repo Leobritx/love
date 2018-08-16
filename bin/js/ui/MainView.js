@@ -21,14 +21,12 @@ var MainView = /** @class */ (function (_super) {
         _this.init();
         return _this;
     }
-    //public evm:ElementViewManage; 	
-    //private levm: LevelReqViewManage;
     MainView.prototype.init = function () {
         var Event = Laya.Event;
         //初始化背景颜色
         Laya.stage.bgColor = "#94deec";
         this.btnStart.on(Event.MOUSE_DOWN, this, this.onMouseDown);
-        //this.imgAvatar.loadImage("");
+        this.imgAvatar.loadImage("gameui/brick.png");
     };
     MainView.prototype.onMouseDown = function (e) {
         UIManager.Instance.switchUI(UIType.GameView);
