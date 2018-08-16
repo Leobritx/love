@@ -17,8 +17,21 @@ var Player = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this.maze = maze;
         _this.data = new PlayerData(cell && cell.col || c, cell && cell.row || r);
+        _this.loadImage(Player.plBgUrl);
+        _this.maze.addChild(_this);
+        _this.pivot(_this.width * 0.5, _this.height * 0.5).scale(0.5, 0.5);
+        _this.SetPlayerMazePosByCell(_this.data.mazePos);
         return _this;
     }
+    Player.prototype.SetPlayerMazePos = function (c, r) {
+        var pos = this.maze.CellParamsToPos(c, r);
+        this.pos(pos.x, pos.y);
+    };
+    Player.prototype.SetPlayerMazePosByCell = function (cell) {
+        var pos = this.maze.CellToPos(cell);
+        this.pos(pos.x, pos.y);
+    };
+    Player.plBgUrl = "gameui/player.png";
     return Player;
 }(Laya.Sprite));
 //# sourceMappingURL=Player.js.map

@@ -31,6 +31,7 @@
             "props":{"y":300,"x":225,"width":150,"var":"imgAvatar","height":150},
             "nodeParent":1,
             "label":"Image(imgAvatar)",
+            "isOpen":true,
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,

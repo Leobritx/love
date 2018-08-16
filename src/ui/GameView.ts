@@ -7,15 +7,12 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
         this.init();
     }
 
-    //public evm:ElementViewManage; 	
-    //private levm: LevelReqViewManage;
-
     public init(): void {
         Laya.stage.bgColor = "#959595";
-        
+
         //添加迷宫
-        let maze = new Maze(0,200,600,600);
-        this.addChild(maze);        
+        let maze = new Maze(0, 200, 600, 600);
+        this.addChild(maze);
     }
 
     //UIBase接口

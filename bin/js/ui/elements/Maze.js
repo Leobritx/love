@@ -19,12 +19,15 @@ var Maze = /** @class */ (function (_super) {
         _this.data = new MazeData();
         //迷宫UI表现初始化
         //设置迷宫背景
-        _this.loadImage(Maze.mzBgUrl, x, y, w, h);
+        _this.loadImage(Maze.mzBgUrl, 0, 0, w, h);
+        _this.pos(x, y);
         _this.CellWidth = _this.width / MazeData.COLUMN_NUM; //需要从测试看是否向下取整
         _this.CellHeight = _this.height / MazeData.ROW_NUM;
         //添加玩家
         var ownerPlayer = new Player(_this, MazeData.COLUMN_NUM - 1, MazeData.ROW_NUM - 1);
         var otherPlayer = new Player(_this, 0, 0);
+        //this.graphics.drawLine(0, 0, 100, 200, "#ffffff", 8);
+        _this.DrawWalls();
         return _this;
     }
     Maze.prototype.PosPointToCell = function (pos) {
@@ -34,11 +37,45 @@ var Maze = /** @class */ (function (_super) {
         var cell = new MazeCell(x / this.CellWidth, y / this.CellHeight);
         return cell;
     };
-    Maze.prototype.CellToPos = function (cell) {
+    Maze.prototype.CellParamsToPos = function (col, row) {
         var pos = new Laya.Point();
-        pos.x = Math.floor((cell.col + 0.5) * this.CellWidth);
-        pos.y = Math.floor((cell.row + 0.5) * this.CellHeight);
+        pos.x = Math.floor((col + 0.5) * this.CellWidth);
+        pos.y = Math.floor((row + 0.5) * this.CellHeight);
         return pos;
+    };
+    Maze.prototype.CellToPos = function (cell) {
+        return this.CellParamsToPos(cell.col, cell.row);
+    };
+    Maze.prototype.DrawWalls = function () {
+        var mazeArr = this.data.mazeArr;
+        for (var col = 0; col < MazeData.COLUMN_NUM; col++) {
+            for (var row = 0; row < MazeData.ROW_NUM; row++) {
+                for (var wall = 0; wall < 4; wall++) {
+                    //0为有墙，1为没有墙
+                    if (mazeArr[col][row][wall] == 0) {
+                        this.drawWall(col, row, wall);
+                    }
+                }
+            }
+        }
+    };
+    Maze.prototype.drawWall = function (c, r, w) {
+        if (w == 0) {
+            //画左边的墙
+            this.graphics.drawLine(c * this.CellWidth, r * this.CellHeight, c * this.CellWidth, (r + 1) * this.CellHeight, "#ffffff", 8);
+        }
+        if (w == 1) {
+            //画上边的墙
+            this.graphics.drawLine(c * this.CellWidth, r * this.CellHeight, (c + 1) * this.CellWidth, r * this.CellHeight, "#ffffff", 8);
+        }
+        if (w == 2) {
+            //画右边的墙
+            this.graphics.drawLine((c + 1) * this.CellWidth, r * this.CellHeight, (c + 1) * this.CellWidth, (r + 1) * this.CellHeight, "#ffffff", 8);
+        }
+        if (w == 3) {
+            //画下边的墙
+            this.graphics.drawLine(c * this.CellWidth, (r + 1) * this.CellHeight, (c + 1) * this.CellWidth, (r + 1) * this.CellHeight, "#ffffff", 8);
+        }
     };
     Maze.mzBgUrl = "gameui/brickbg.png";
     return Maze;
