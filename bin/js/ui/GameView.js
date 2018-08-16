@@ -21,8 +21,6 @@ var GameView = /** @class */ (function (_super) {
         _this.init();
         return _this;
     }
-    //public evm:ElementViewManage; 	
-    //private levm: LevelReqViewManage;
     GameView.prototype.init = function () {
         Laya.stage.bgColor = "#959595";
         //添加迷宫

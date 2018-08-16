@@ -53434,18 +53434,18 @@ var ResType;
 })(ResType || (ResType = {}));
 var ResourceManager = /** @class */ (function () {
     function ResourceManager() {
-        this.ROBOT_DATA_PATH = "res/data/l1.json";
-        this.ROBOT_TEXTURE_PATH = "res/atlas/gameui.atlas";
-        this.ROBOT_IMG_PATH = "res/atlas/gameui.png";
+        this.DATA_PATH = "res/data/l1.json";
+        this.UI_TEXTURE_PATH = "res/atlas/gameui.atlas";
+        this.UI_IMG_PATH = "res/atlas/gameui.png";
         this.resArr = [];
         ResourceManager.Instance = this;
     }
     ResourceManager.prototype.Load = function (call) {
         //资源图集预加载
         var resArray = [];
-        //resArray.push({ url: this.ROBOT_DATA_PATH, type: Laya.Loader.JSON});
-        resArray.push({ url: this.ROBOT_TEXTURE_PATH, type: Laya.Loader.ATLAS });
-        resArray.push({ url: this.ROBOT_IMG_PATH, type: Laya.Loader.IMAGE });
+        //resArray.push({ url: this.DATA_PATH, type: Laya.Loader.JSON});
+        resArray.push({ url: this.UI_TEXTURE_PATH, type: Laya.Loader.ATLAS });
+        resArray.push({ url: this.UI_IMG_PATH, type: Laya.Loader.IMAGE });
         //  需要loading界面的话就在此函数增加一个回调函数
         Laya.loader.load(resArray, call);
     };
@@ -53476,22 +53476,91 @@ var DataManager = /** @class */ (function () {
 }());
 //# sourceMappingURL=DataManager.js.map
 //# sourceMappingURL=UserData.js.map
+var PlayerData = /** @class */ (function () {
+    function PlayerData(c, r) {
+        this.mazePos = new MazeCell(c, r);
+    }
+    return PlayerData;
+}());
 //# sourceMappingURL=PlayerData.js.map
 var MazeCell = /** @class */ (function () {
-    function MazeCell() {
+    function MazeCell(c, r) {
+        this.row = Math.floor(r || 0);
+        this.col = Math.floor(c || 0);
     }
     return MazeCell;
 }());
 var MazeData = /** @class */ (function () {
     function MazeData() {
         //初始化迷宫
-        for (var i = 0; i < MazeData.ROW_NUM; i++) {
-            this.mazeArr[i] = [];
-            for (var j = 0; j < MazeData.COLUMN_NUM; j++) {
+        this.initArr();
+        this.initMaze();
+    }
+    MazeData.prototype.initArr = function () {
+        this.mazeArr = new Array(MazeData.COLUMN_NUM);
+        for (var i = 0; i < MazeData.COLUMN_NUM; i++) {
+            this.mazeArr[i] = new Array(MazeData.ROW_NUM);
+            for (var j = 0; j < MazeData.ROW_NUM; j++) {
                 this.mazeArr[i][j] = [0, 0, 0, 0, 0];
             }
         }
-    }
+    };
+    MazeData.prototype.initMaze = function () {
+        var history = new Array();
+        var r = 0;
+        var c = 0;
+        history.push([c, r]);
+        while (history.length > 0) {
+            this.mazeArr[c][r][4] = 1; // designate this location as visited
+            var check = new Array();
+            if (c > 0 && this.mazeArr[c - 1][r][4] == 0) {
+                check.push('L');
+            }
+            if (r > 0 && this.mazeArr[c][r - 1][4] == 0) {
+                check.push('U');
+            }
+            if (c < MazeData.COLUMN_NUM - 1 && this.mazeArr[c + 1][r][4] == 0) {
+                check.push('R');
+            }
+            if (r < MazeData.ROW_NUM - 1 && this.mazeArr[c][r + 1][4] == 0) {
+                check.push('D');
+            }
+            if (check.length > 0) { // If there is a valid cell to move to.
+                // Mark the walls between cells as open if we move
+                history.push([c, r]);
+                var index = Math.floor(Math.random() * 4);
+                var move_direction = check[index];
+                if (move_direction == 'L') {
+                    this.mazeArr[c][r][0] = 1;
+                    c = c - 1;
+                    this.mazeArr[c][r][2] = 1;
+                }
+                if (move_direction == 'U') {
+                    this.mazeArr[c][r][1] = 1;
+                    r = r - 1;
+                    this.mazeArr[c][r][3] = 1;
+                }
+                if (move_direction == 'R') {
+                    this.mazeArr[c][r][2] = 1;
+                    c = c + 1;
+                    this.mazeArr[c][r][0] = 1;
+                }
+                if (move_direction == 'D') {
+                    this.mazeArr[c][r][3] = 1;
+                    r = r + 1;
+                    this.mazeArr[c][r][1] = 1;
+                }
+            }
+            else {
+                var outarr = history.pop();
+                c = outarr[0];
+                r = outarr[1];
+            }
+        }
+        //入口和出口墙去掉
+        this.mazeArr[0][0][1] = 1;
+        this.mazeArr[MazeData.COLUMN_NUM - 1][MazeData.ROW_NUM - 1][3] = 1;
+    };
     MazeData.ROW_NUM = 10;
     MazeData.COLUMN_NUM = 10;
     return MazeData;
@@ -53599,34 +53668,113 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var Sprite = Laya.Sprite;
-var Point = Laya.Point;
 var Maze = /** @class */ (function (_super) {
     __extends(Maze, _super);
-    function Maze() {
+    function Maze(x, y, w, h) {
         var _this = _super.call(this) || this;
         //初始化迷宫数据
         _this.data = new MazeData();
         //迷宫UI表现初始化
         //设置迷宫背景
-        _this.loadImage('', 0, 0, 100, 100);
+        _this.loadImage(Maze.mzBgUrl, 0, 0, w, h);
+        _this.pos(x, y);
         _this.CellWidth = _this.width / MazeData.COLUMN_NUM; //需要从测试看是否向下取整
         _this.CellHeight = _this.height / MazeData.ROW_NUM;
+        //添加玩家
+        var ownerPlayer = new Player(_this, MazeData.COLUMN_NUM - 1, MazeData.ROW_NUM - 1);
+        var otherPlayer = new Player(_this, 0, 0);
+        //this.graphics.drawLine(0, 0, 100, 200, "#ffffff", 8);
+        _this.DrawWalls();
         return _this;
     }
+    Maze.prototype.PosPointToCell = function (pos) {
+        return this.PosToCell(pos.x, pos.y);
+    };
     Maze.prototype.PosToCell = function (x, y) {
-        var cell = new MazeCell();
+        var cell = new MazeCell(x / this.CellWidth, y / this.CellHeight);
         return cell;
     };
-    Maze.prototype.CellToPos = function (cell) {
-        var pos = new Point();
-        pos.x = Math.floor((cell.col + 0.5) * this.CellWidth);
-        pos.y = Math.floor((cell.row + 0.5) * this.CellHeight);
+    Maze.prototype.CellParamsToPos = function (col, row) {
+        var pos = new Laya.Point();
+        pos.x = Math.floor((col + 0.5) * this.CellWidth);
+        pos.y = Math.floor((row + 0.5) * this.CellHeight);
         return pos;
     };
+    Maze.prototype.CellToPos = function (cell) {
+        return this.CellParamsToPos(cell.col, cell.row);
+    };
+    Maze.prototype.DrawWalls = function () {
+        var mazeArr = this.data.mazeArr;
+        for (var col = 0; col < MazeData.COLUMN_NUM; col++) {
+            for (var row = 0; row < MazeData.ROW_NUM; row++) {
+                for (var wall = 0; wall < 4; wall++) {
+                    //0为有墙，1为没有墙
+                    if (mazeArr[col][row][wall] == 0) {
+                        this.drawWall(col, row, wall);
+                    }
+                }
+            }
+        }
+    };
+    Maze.prototype.drawWall = function (c, r, w) {
+        if (w == 0) {
+            //画左边的墙
+            this.graphics.drawLine(c * this.CellWidth, r * this.CellHeight, c * this.CellWidth, (r + 1) * this.CellHeight, "#ffffff", 8);
+        }
+        if (w == 1) {
+            //画上边的墙
+            this.graphics.drawLine(c * this.CellWidth, r * this.CellHeight, (c + 1) * this.CellWidth, r * this.CellHeight, "#ffffff", 8);
+        }
+        if (w == 2) {
+            //画右边的墙
+            this.graphics.drawLine((c + 1) * this.CellWidth, r * this.CellHeight, (c + 1) * this.CellWidth, (r + 1) * this.CellHeight, "#ffffff", 8);
+        }
+        if (w == 3) {
+            //画下边的墙
+            this.graphics.drawLine(c * this.CellWidth, (r + 1) * this.CellHeight, (c + 1) * this.CellWidth, (r + 1) * this.CellHeight, "#ffffff", 8);
+        }
+    };
+    Maze.mzBgUrl = "gameui/brickbg.png";
     return Maze;
-}(Sprite));
+}(Laya.Sprite));
 //# sourceMappingURL=Maze.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var Player = /** @class */ (function (_super) {
+    __extends(Player, _super);
+    function Player(maze, c, r, cell) {
+        var _this = _super.call(this) || this;
+        _this.maze = maze;
+        _this.data = new PlayerData(cell && cell.col || c, cell && cell.row || r);
+        _this.loadImage(Player.plBgUrl);
+        _this.maze.addChild(_this);
+        _this.pivot(_this.width * 0.5, _this.height * 0.5).scale(0.5, 0.5);
+        _this.SetPlayerMazePosByCell(_this.data.mazePos);
+        return _this;
+    }
+    Player.prototype.SetPlayerMazePos = function (c, r) {
+        var pos = this.maze.CellParamsToPos(c, r);
+        this.pos(pos.x, pos.y);
+    };
+    Player.prototype.SetPlayerMazePosByCell = function (cell) {
+        var pos = this.maze.CellToPos(cell);
+        this.pos(pos.x, pos.y);
+    };
+    Player.plBgUrl = "gameui/player.png";
+    return Player;
+}(Laya.Sprite));
+//# sourceMappingURL=Player.js.map
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -53655,7 +53803,7 @@ var ui;
                 _super.prototype.createChildren.call(this);
                 this.createView(ui.UI.GamePageUI.uiView);
             };
-            GamePageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 }, "child": [{ "type": "Image", "props": { "y": 200, "x": 0, "width": 100, "skin": "comp/brick.png", "height": 100 } }, { "type": "Image", "props": { "y": 352, "x": 56, "width": 449, "var": "imgMazeBg", "skin": "comp/brick.png", "height": 373 } }, { "type": "Image", "props": { "y": 36, "x": 36, "width": 152, "skin": "comp/image.png", "height": 134 } }] };
+            GamePageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 } };
             return GamePageUI;
         }(View));
         UI.GamePageUI = GamePageUI;
@@ -53673,7 +53821,7 @@ var ui;
                 _super.prototype.createChildren.call(this);
                 this.createView(ui.UI.MainPageUI.uiView);
             };
-            MainPageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 }, "child": [{ "type": "Button", "props": { "y": 550, "x": 150, "width": 300, "var": "btnStart", "skin": "gameui/button.png", "labelSize": 40, "labelFont": "Microsoft YaHei", "label": "Start", "height": 100, "sizeGrid": "5,10,10,5" } }, { "type": "Image", "props": { "y": 300, "x": 225, "width": 150, "var": "imgAvatar", "skin": "comp/image.png", "height": 150 } }] };
+            MainPageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 }, "child": [{ "type": "Button", "props": { "y": 550, "x": 150, "width": 300, "var": "btnStart", "skin": "gameui/button.png", "labelSize": 40, "labelFont": "Microsoft YaHei", "label": "Start", "height": 100, "sizeGrid": "5,10,10,5" } }, { "type": "Image", "props": { "y": 300, "x": 225, "width": 150, "var": "imgAvatar", "height": 150 } }] };
             return MainPageUI;
         }(View));
         UI.MainPageUI = MainPageUI;
@@ -53703,11 +53851,11 @@ var GameView = /** @class */ (function (_super) {
         _this.init();
         return _this;
     }
-    //public evm:ElementViewManage; 	
-    //private levm: LevelReqViewManage;
     GameView.prototype.init = function () {
         Laya.stage.bgColor = "#959595";
-        this.imgMazeBg.graphics.drawLine(0, 0, 100, 120, "#ffff99", 2);
+        //添加迷宫
+        var maze = new Maze(0, 200, 600, 600);
+        this.addChild(maze);
     };
     //UIBase接口
     GameView.prototype.open = function (obj, call) {
@@ -53722,7 +53870,6 @@ var GameView = /** @class */ (function (_super) {
     };
     GameView.prototype.hide = function () {
     };
-    //回调后会调用show，用于显示UI时的一些表现
     GameView.prototype.show = function () {
     };
     return GameView;
@@ -53751,14 +53898,12 @@ var MainView = /** @class */ (function (_super) {
         _this.init();
         return _this;
     }
-    //public evm:ElementViewManage; 	
-    //private levm: LevelReqViewManage;
     MainView.prototype.init = function () {
         var Event = Laya.Event;
         //初始化背景颜色
         Laya.stage.bgColor = "#94deec";
         this.btnStart.on(Event.MOUSE_DOWN, this, this.onMouseDown);
-        //this.imgAvatar.loadImage("");
+        this.imgAvatar.loadImage("gameui/brick.png");
     };
     MainView.prototype.onMouseDown = function (e) {
         UIManager.Instance.switchUI(UIType.GameView);
