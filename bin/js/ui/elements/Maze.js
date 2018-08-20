@@ -30,7 +30,7 @@ var Maze = /** @class */ (function (_super) {
         _this.ownerPlayer.on(Laya.Event.MOUSE_DOWN, _this, _this.onTouchDown);
         var fps = 60; //帧率
         var deltaTime = 1000 / fps;
-        Laya.timer.loop(1000 / 60, _this, _this.update);
+        Laya.timer.loop(500, _this, _this.update);
         _this.DrawWalls();
         return _this;
     }
@@ -120,13 +120,16 @@ var Maze = /** @class */ (function (_super) {
     };
     ///Event Handlers
     Maze.prototype.update = function (e) {
+        this.pathArr.reverse(); //要使用队列，先使用数组翻转解决
         var nextCell = this.pathArr.pop();
         if (nextCell != null) {
             var pos = this.CellToPos(nextCell);
-            Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 1000 / 60);
+            Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 200);
         }
+        this.pathArr.reverse();
     };
     Maze.prototype.onTouchDown = function (e) {
+        this.pathArr = new Array();
         var mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
         var curCell = this.PosPointToCell(mzPos);
         this.pathArr.push(curCell);
@@ -136,13 +139,13 @@ var Maze = /** @class */ (function (_super) {
         //this.ownerPlayer.on(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
     };
     Maze.prototype.onTouchUp = function (e) {
-        this.pathArr = new Array();
         //添加鼠标移到侦听
         Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
         Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onTouchUp);
         //this.ownerPlayer.off(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
     };
     Maze.prototype.onTouchMove = function (e) {
+        //console.log("onTouchMove",Laya.stage.mouseX,Laya.stage.mouseY);
         var mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
         var curCell = this.PosPointToCell(mzPos);
         for (var i = 0; i < this.pathArr.length; i++) {

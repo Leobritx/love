@@ -34,7 +34,7 @@ class Maze extends Laya.Sprite {
 
         let fps = 60;//帧率
         let deltaTime = 1000 / fps;
-        Laya.timer.loop(1000/60, this, this.update);
+        Laya.timer.loop(500, this, this.update);
 
         this.DrawWalls();
     }
@@ -134,14 +134,17 @@ class Maze extends Laya.Sprite {
 
     ///Event Handlers
     private update(e) {
+        this.pathArr.reverse();//要使用队列，先使用数组翻转解决
         let nextCell = this.pathArr.pop();
         if (nextCell != null) {
             let pos = this.CellToPos(nextCell);
-            Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 1000/60);
+            Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 200);
         }
+        this.pathArr.reverse();
     }
 
     private onTouchDown(e) {
+        this.pathArr = new Array<MazeCell>();
         let mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
         let curCell = this.PosPointToCell(mzPos);
         this.pathArr.push(curCell);
@@ -153,7 +156,6 @@ class Maze extends Laya.Sprite {
     }
 
     private onTouchUp(e) {
-        this.pathArr = new Array<MazeCell>();
         //添加鼠标移到侦听
         Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
 
@@ -162,6 +164,7 @@ class Maze extends Laya.Sprite {
     }
 
     private onTouchMove(e) {
+        //console.log("onTouchMove",Laya.stage.mouseX,Laya.stage.mouseY);
         let mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
         let curCell = this.PosPointToCell(mzPos);
         for (let i = 0; i < this.pathArr.length; i++) {
