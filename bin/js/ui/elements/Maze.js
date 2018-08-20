@@ -98,20 +98,20 @@ var Maze = /** @class */ (function (_super) {
         var mwClr = Maze.mzWallColor;
         var mwWidth = Maze.mzWallWidth;
         if (w == 0) {
-            this.graphics.drawCircle(c * cW, r * cH, mwWidth / 2, mwClr, mwClr, 1);
-            this.graphics.drawCircle(c * cW, (r + 1) * cH, mwWidth / 2, mwClr, mwClr, 1);
+            this.graphics.drawCircle(c * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.graphics.drawCircle(c * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
         }
         if (w == 1) {
-            this.graphics.drawCircle(c * cW, r * cH, mwWidth / 2, mwClr, mwClr, 1);
-            this.graphics.drawCircle((c + 1) * cW, r * cH, mwWidth / 2, mwClr, mwClr, 1);
+            this.graphics.drawCircle(c * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.graphics.drawCircle((c + 1) * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
         }
         if (w == 2) {
-            this.graphics.drawCircle((c + 1) * cW, r * cH, mwWidth / 2, mwClr, mwClr, 1);
-            this.graphics.drawCircle((c + 1) * cW, (r + 1) * cH, mwWidth / 2, mwClr, mwClr, 1);
+            this.graphics.drawCircle((c + 1) * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.graphics.drawCircle((c + 1) * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
         }
         if (w == 3) {
-            this.graphics.drawCircle(c * cW, (r + 1) * cH, mwWidth / 2, mwClr, mwClr, 1);
-            this.graphics.drawCircle((c + 1) * cW, (r + 1) * cH, mwWidth / 2, mwClr, mwClr, 1);
+            this.graphics.drawCircle(c * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.graphics.drawCircle((c + 1) * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
         }
     };
     Maze.prototype.drawPathByCell = function (cell) {
