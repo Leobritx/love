@@ -1,6 +1,6 @@
 class Maze extends Laya.Sprite {
     private static mzBgUrl = "gameui/brickbg.png";
-    private static mzWallColor = "#ffffff";
+    private static mzWallColor = "#734d26";
     private static mzWallWidth = 8;
 
     private data: MazeData;
@@ -59,6 +59,31 @@ class Maze extends Laya.Sprite {
         return this.CellParamsToPos(cell.col, cell.row);
     }
 
+    public CheckValidStep(cur: MazeCell, next: MazeCell) {
+        let dr = next.row - cur.row;
+        let dc = next.col - cur.col;
+        console.log(dc, dr)
+        if ((!!dr == !!dc) || Math.abs(dc) > 1 || Math.abs(dr) > 1) {
+            console.log("false", dc, dr)
+            return false;
+        }
+        let mazeArr = this.data.mazeArr;
+        let cell = mazeArr[cur.col][cur.row];
+        if (cell[0] == 0 && dc == -1 && dr == 0) {//left
+            return false;
+        }
+        if (cell[1] == 0 && dc == 0 && dr == -1) {//up
+            return false;
+        }
+        if (cell[2] == 0 && dc == 1 && dr == 0) {//right
+            return false;
+        }
+        if (cell[3] == 0 && dc == 0 && dr == 1) {//down
+            return false;
+        }
+        return true;
+    }
+
     ///Drawing
     //画墙
     private DrawWalls() {
@@ -68,9 +93,10 @@ class Maze extends Laya.Sprite {
                 for (var wall = 0; wall < 4; wall++) {
                     //0为有墙，1为没有墙
                     if (mazeArr[col][row][wall] == 0) {
-                        this.drawWall(col, row, wall);
+                        this.drawWall(col, row, wall, Maze.mzWallWidth);
                     }
                     else {
+                        this.drawWall(col, row, wall, 1, "#ffffff");
                         this.drawCircle(col, row, wall);
                     }
                 }
@@ -78,26 +104,25 @@ class Maze extends Laya.Sprite {
         }
     }
     //画一面墙
-    private drawWall(c, r, w) {
+    private drawWall(c, r, w, wWidth, color?) {
         let cW = this.CellWidth;
         let cH = this.CellHeight;
-        let mwClr = Maze.mzWallColor;
-        let mwWidth = Maze.mzWallWidth;
+        let mwClr = color || Maze.mzWallColor;
         if (w == 0) {
             //画左边的墙
-            this.graphics.drawLine(c * cW, r * cH, c * cW, (r + 1) * cH, mwClr, mwWidth);
+            this.graphics.drawLine(c * cW, r * cH, c * cW, (r + 1) * cH, mwClr, wWidth);
         }
         if (w == 1) {
             //画上边的墙
-            this.graphics.drawLine(c * cW, r * cH, (c + 1) * cW, r * cH, mwClr, mwWidth);
+            this.graphics.drawLine(c * cW, r * cH, (c + 1) * cW, r * cH, mwClr, wWidth);
         }
         if (w == 2) {
             //画右边的墙
-            this.graphics.drawLine((c + 1) * cW, r * cH, (c + 1) * cW, (r + 1) * cH, mwClr, mwWidth);
+            this.graphics.drawLine((c + 1) * cW, r * cH, (c + 1) * cW, (r + 1) * cH, mwClr, wWidth);
         }
         if (w == 3) {
             //画下边的墙
-            this.graphics.drawLine(c * cW, (r + 1) * cH, (c + 1) * cW, (r + 1) * cH, mwClr, mwWidth);
+            this.graphics.drawLine(c * cW, (r + 1) * cH, (c + 1) * cW, (r + 1) * cH, mwClr, wWidth);
         }
     }
     //给墙的缝隙画上
@@ -134,19 +159,20 @@ class Maze extends Laya.Sprite {
 
     ///Event Handlers
     private update(e) {
-        this.pathArr.reverse();//要使用队列，先使用数组翻转解决
-        let nextCell = this.pathArr.pop();
+        let nextCell = this.pathArr.shift();
         if (nextCell != null) {
-            let pos = this.CellToPos(nextCell);
-            Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 200);
+            let curCell = this.ownerPlayer.GetCurCell();
+            if (!curCell.Equal(nextCell)) {
+                this.ownerPlayer.SetCurCell(nextCell);
+                let pos = this.CellToPos(nextCell);
+                Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 200);
+            }
         }
-        this.pathArr.reverse();
     }
 
     private onTouchDown(e) {
         this.pathArr = new Array<MazeCell>();
-        let mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
-        let curCell = this.PosPointToCell(mzPos);
+        let curCell = this.ownerPlayer.GetCurCell();
         this.pathArr.push(curCell);
         //添加鼠标移到侦听
         Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
@@ -166,18 +192,23 @@ class Maze extends Laya.Sprite {
     private onTouchMove(e) {
         //console.log("onTouchMove",Laya.stage.mouseX,Laya.stage.mouseY);
         let mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
-        let curCell = this.PosPointToCell(mzPos);
-        for (let i = 0; i < this.pathArr.length; i++) {
-            let element = this.pathArr[i];
-            if (element.col == curCell.col && element.row == curCell.row) {
-                return
+        let nextCell = this.PosPointToCell(mzPos);
+        let curCell = this.pathArr.pop() || this.ownerPlayer.GetCurCell();
+        this.pathArr.push(curCell);
+        if (this.CheckValidStep(curCell, nextCell)) {
+            if (!nextCell.Equal(curCell)) {
+                this.pathArr.push(nextCell);
             }
         }
-        this.pathArr.push(curCell);
     }
 
     private convertPosToMaze(x, y) {
-        return new Laya.Point(x - this.x > 0 ? x - this.x : 0, y - this.y > 0 ? y - this.y : 0);
+        let rx = x - this.x;
+        rx = rx > 0 ? rx : 0;
+        rx = rx - this.width > 0 ? this.width : rx;
+        let ry = y - this.y;
+        ry = ry > 0 ? ry : 0;
+        ry = rx - this.height > 0 ? this.height : ry;
+        return new Laya.Point(rx, ry);
     }
-
 }

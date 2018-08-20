@@ -8,7 +8,11 @@ var UIManager = /** @class */ (function () {
     function UIManager() {
         this.openArray = [];
         this.hideArray = [];
+        this.viewMap = [];
         UIManager.Instance = this;
+        //将View做一个映射
+        this.viewMap[UIType.MainView] = function () { return new MainView(); };
+        this.viewMap[UIType.GameView] = function () { return new GameView(); };
     }
     UIManager.prototype.openUI = function (type, obj, call) {
         if (obj === void 0) { obj = null; }
@@ -37,7 +41,7 @@ var UIManager = /** @class */ (function () {
             }
             try {
                 //将uitype的string和类名关联
-                ui = eval("new " + UIType[type] + "()");
+                ui = this.viewMap[type]();
             }
             catch (e) {
                 console.log(e);

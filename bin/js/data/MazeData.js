@@ -3,6 +3,9 @@ var MazeCell = /** @class */ (function () {
         this.row = Math.floor(r || 0);
         this.col = Math.floor(c || 0);
     }
+    MazeCell.prototype.Equal = function (to) {
+        return to && this.row == to.row && this.col == to.col;
+    };
     return MazeCell;
 }());
 var MazeData = /** @class */ (function () {

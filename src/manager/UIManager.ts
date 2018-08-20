@@ -25,8 +25,13 @@ class UIManager {
     private openArray: UIBase[] = [];
     private hideArray: UIBase[] = [];
 
+    private viewMap : any = [];
+
     constructor() {
         UIManager.Instance = this;
+        //将View做一个映射
+        this.viewMap[UIType.MainView] = ()=>{return new MainView();};
+        this.viewMap[UIType.GameView] = ()=>{return new GameView();};
     }
 
     public openUI(type: UIType, obj: any[] = null, call: Laya.Handler = null) {
@@ -56,7 +61,7 @@ class UIManager {
 
             try {
                 //将uitype的string和类名关联
-                ui = eval("new " + UIType[type] + "()");
+                ui = this.viewMap[type]();
             }
             catch (e) {
                 console.log(e);

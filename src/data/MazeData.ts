@@ -6,6 +6,10 @@ class MazeCell {
         this.row = Math.floor(r || 0);
         this.col = Math.floor(c || 0);
     }
+
+    public Equal(to: MazeCell) {
+        return to && this.row == to.row && this.col == to.col;
+    }
 }
 
 class MazeData {

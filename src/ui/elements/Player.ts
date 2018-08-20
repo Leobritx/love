@@ -13,16 +13,24 @@ class Player extends Laya.Sprite {
         this.maze.addChild(this);
 
         this.pivot(this.width * 0.5, this.height * 0.5).scale(0.5, 0.5);
-        this.SetPlayerMazePosByCell(this.data.mazePos);
+        this.RefreshMazePos();
     }
 
-    public SetPlayerMazePos(c, r) {
-        let pos = this.maze.CellParamsToPos(c, r);
+    public RefreshMazePos() {
+        let pos = this.maze.CellToPos(this.data.mazePos);
         this.pos(pos.x, pos.y);
     }
 
-    public SetPlayerMazePosByCell(cell: MazeCell) {
-        let pos = this.maze.CellToPos(cell);
-        this.pos(pos.x, pos.y);
+    public SetCurCellByParams(c, r) {
+        this.data.mazePos.col = c || 0;
+        this.data.mazePos.row = r || 0;
+    }
+
+    public SetCurCell(cell: MazeCell) {
+        this.data.mazePos = cell;
+    }
+
+    public GetCurCell() {
+        return this.data.mazePos;
     }
 }

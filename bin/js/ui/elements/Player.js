@@ -20,16 +20,22 @@ var Player = /** @class */ (function (_super) {
         _this.loadImage(Player.plBgUrl);
         _this.maze.addChild(_this);
         _this.pivot(_this.width * 0.5, _this.height * 0.5).scale(0.5, 0.5);
-        _this.SetPlayerMazePosByCell(_this.data.mazePos);
+        _this.RefreshMazePos();
         return _this;
     }
-    Player.prototype.SetPlayerMazePos = function (c, r) {
-        var pos = this.maze.CellParamsToPos(c, r);
+    Player.prototype.RefreshMazePos = function () {
+        var pos = this.maze.CellToPos(this.data.mazePos);
         this.pos(pos.x, pos.y);
     };
-    Player.prototype.SetPlayerMazePosByCell = function (cell) {
-        var pos = this.maze.CellToPos(cell);
-        this.pos(pos.x, pos.y);
+    Player.prototype.SetCurCellByParams = function (c, r) {
+        this.data.mazePos.col = c || 0;
+        this.data.mazePos.row = r || 0;
+    };
+    Player.prototype.SetCurCell = function (cell) {
+        this.data.mazePos = cell;
+    };
+    Player.prototype.GetCurCell = function () {
+        return this.data.mazePos;
     };
     Player.plBgUrl = "gameui/player.png";
     return Player;
