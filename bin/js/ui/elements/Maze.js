@@ -53,9 +53,9 @@ var Maze = /** @class */ (function (_super) {
     Maze.prototype.CheckValidStep = function (cur, next) {
         var dr = next.row - cur.row;
         var dc = next.col - cur.col;
-        console.log(dc, dr);
+        //console.log(dc, dr)
         if ((!!dr == !!dc) || Math.abs(dc) > 1 || Math.abs(dr) > 1) {
-            console.log("false", dc, dr);
+            //console.log("false", dc, dr)
             return false;
         }
         var mazeArr = this.data.mazeArr;
@@ -73,6 +73,15 @@ var Maze = /** @class */ (function (_super) {
             return false;
         }
         return true;
+    };
+    Maze.prototype.convertPosToMaze = function (x, y) {
+        var rx = x - this.x;
+        rx = rx > 0 ? rx : 0;
+        rx = rx - this.width > 0 ? this.width : rx;
+        var ry = y - this.y;
+        ry = ry > 0 ? ry : 0;
+        ry = rx - this.height > 0 ? this.height : ry;
+        return new Laya.Point(rx, ry);
     };
     ///Drawing
     //画墙
@@ -139,8 +148,12 @@ var Maze = /** @class */ (function (_super) {
         }
     };
     Maze.prototype.drawPathByCell = function (cell) {
+        this.drawPathByCellParam(cell.col, cell.row);
     };
     Maze.prototype.drawPathByCellParam = function (col, row) {
+        var cW = this.CellWidth;
+        var cH = this.CellHeight;
+        this.graphics.drawRect(col * cW + 10, row * cH + 10, cW - 20, cH - 20, "#ffffff");
     };
     ///Event Handlers
     Maze.prototype.update = function (e) {
@@ -178,17 +191,9 @@ var Maze = /** @class */ (function (_super) {
         if (this.CheckValidStep(curCell, nextCell)) {
             if (!nextCell.Equal(curCell)) {
                 this.pathArr.push(nextCell);
+                this.drawPathByCell(nextCell);
             }
         }
-    };
-    Maze.prototype.convertPosToMaze = function (x, y) {
-        var rx = x - this.x;
-        rx = rx > 0 ? rx : 0;
-        rx = rx - this.width > 0 ? this.width : rx;
-        var ry = y - this.y;
-        ry = ry > 0 ? ry : 0;
-        ry = rx - this.height > 0 ? this.height : ry;
-        return new Laya.Point(rx, ry);
     };
     Maze.mzBgUrl = "gameui/brickbg.png";
     Maze.mzWallColor = "#734d26";

@@ -53488,6 +53488,9 @@ var MazeCell = /** @class */ (function () {
         this.row = Math.floor(r || 0);
         this.col = Math.floor(c || 0);
     }
+    MazeCell.prototype.Equal = function (to) {
+        return to && this.row == to.row && this.col == to.col;
+    };
     return MazeCell;
 }());
 var MazeData = /** @class */ (function () {
@@ -53576,7 +53579,11 @@ var UIManager = /** @class */ (function () {
     function UIManager() {
         this.openArray = [];
         this.hideArray = [];
+        this.viewMap = [];
         UIManager.Instance = this;
+        //将View做一个映射
+        this.viewMap[UIType.MainView] = function () { return new MainView(); };
+        this.viewMap[UIType.GameView] = function () { return new GameView(); };
     }
     UIManager.prototype.openUI = function (type, obj, call) {
         if (obj === void 0) { obj = null; }
@@ -53605,7 +53612,7 @@ var UIManager = /** @class */ (function () {
             }
             try {
                 //将uitype的string和类名关联
-                ui = eval("new " + UIType[type] + "()");
+                ui = this.viewMap[type]();
             }
             catch (e) {
                 console.log(e);
@@ -53707,6 +53714,39 @@ var Maze = /** @class */ (function (_super) {
     Maze.prototype.CellToPos = function (cell) {
         return this.CellParamsToPos(cell.col, cell.row);
     };
+    Maze.prototype.CheckValidStep = function (cur, next) {
+        var dr = next.row - cur.row;
+        var dc = next.col - cur.col;
+        //console.log(dc, dr)
+        if ((!!dr == !!dc) || Math.abs(dc) > 1 || Math.abs(dr) > 1) {
+            //console.log("false", dc, dr)
+            return false;
+        }
+        var mazeArr = this.data.mazeArr;
+        var cell = mazeArr[cur.col][cur.row];
+        if (cell[0] == 0 && dc == -1 && dr == 0) { //left
+            return false;
+        }
+        if (cell[1] == 0 && dc == 0 && dr == -1) { //up
+            return false;
+        }
+        if (cell[2] == 0 && dc == 1 && dr == 0) { //right
+            return false;
+        }
+        if (cell[3] == 0 && dc == 0 && dr == 1) { //down
+            return false;
+        }
+        return true;
+    };
+    Maze.prototype.convertPosToMaze = function (x, y) {
+        var rx = x - this.x;
+        rx = rx > 0 ? rx : 0;
+        rx = rx - this.width > 0 ? this.width : rx;
+        var ry = y - this.y;
+        ry = ry > 0 ? ry : 0;
+        ry = rx - this.height > 0 ? this.height : ry;
+        return new Laya.Point(rx, ry);
+    };
     ///Drawing
     //画墙
     Maze.prototype.DrawWalls = function () {
@@ -53716,9 +53756,10 @@ var Maze = /** @class */ (function (_super) {
                 for (var wall = 0; wall < 4; wall++) {
                     //0为有墙，1为没有墙
                     if (mazeArr[col][row][wall] == 0) {
-                        this.drawWall(col, row, wall);
+                        this.drawWall(col, row, wall, Maze.mzWallWidth);
                     }
                     else {
+                        this.drawWall(col, row, wall, 1, "#ffffff");
                         this.drawCircle(col, row, wall);
                     }
                 }
@@ -53726,26 +53767,25 @@ var Maze = /** @class */ (function (_super) {
         }
     };
     //画一面墙
-    Maze.prototype.drawWall = function (c, r, w) {
+    Maze.prototype.drawWall = function (c, r, w, wWidth, color) {
         var cW = this.CellWidth;
         var cH = this.CellHeight;
-        var mwClr = Maze.mzWallColor;
-        var mwWidth = Maze.mzWallWidth;
+        var mwClr = color || Maze.mzWallColor;
         if (w == 0) {
             //画左边的墙
-            this.graphics.drawLine(c * cW, r * cH, c * cW, (r + 1) * cH, mwClr, mwWidth);
+            this.graphics.drawLine(c * cW, r * cH, c * cW, (r + 1) * cH, mwClr, wWidth);
         }
         if (w == 1) {
             //画上边的墙
-            this.graphics.drawLine(c * cW, r * cH, (c + 1) * cW, r * cH, mwClr, mwWidth);
+            this.graphics.drawLine(c * cW, r * cH, (c + 1) * cW, r * cH, mwClr, wWidth);
         }
         if (w == 2) {
             //画右边的墙
-            this.graphics.drawLine((c + 1) * cW, r * cH, (c + 1) * cW, (r + 1) * cH, mwClr, mwWidth);
+            this.graphics.drawLine((c + 1) * cW, r * cH, (c + 1) * cW, (r + 1) * cH, mwClr, wWidth);
         }
         if (w == 3) {
             //画下边的墙
-            this.graphics.drawLine(c * cW, (r + 1) * cH, (c + 1) * cW, (r + 1) * cH, mwClr, mwWidth);
+            this.graphics.drawLine(c * cW, (r + 1) * cH, (c + 1) * cW, (r + 1) * cH, mwClr, wWidth);
         }
     };
     //给墙的缝隙画上
@@ -53772,23 +53812,28 @@ var Maze = /** @class */ (function (_super) {
         }
     };
     Maze.prototype.drawPathByCell = function (cell) {
+        this.drawPathByCellParam(cell.col, cell.row);
     };
     Maze.prototype.drawPathByCellParam = function (col, row) {
+        var cW = this.CellWidth;
+        var cH = this.CellHeight;
+        this.graphics.drawRect(col * cW + 10, row * cH + 10, cW - 20, cH - 20, "#ffffff");
     };
     ///Event Handlers
     Maze.prototype.update = function (e) {
-        this.pathArr.reverse(); //要使用队列，先使用数组翻转解决
-        var nextCell = this.pathArr.pop();
+        var nextCell = this.pathArr.shift();
         if (nextCell != null) {
-            var pos = this.CellToPos(nextCell);
-            Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 200);
+            var curCell = this.ownerPlayer.GetCurCell();
+            if (!curCell.Equal(nextCell)) {
+                this.ownerPlayer.SetCurCell(nextCell);
+                var pos = this.CellToPos(nextCell);
+                Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 200);
+            }
         }
-        this.pathArr.reverse();
     };
     Maze.prototype.onTouchDown = function (e) {
         this.pathArr = new Array();
-        var mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
-        var curCell = this.PosPointToCell(mzPos);
+        var curCell = this.ownerPlayer.GetCurCell();
         this.pathArr.push(curCell);
         //添加鼠标移到侦听
         Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
@@ -53804,20 +53849,18 @@ var Maze = /** @class */ (function (_super) {
     Maze.prototype.onTouchMove = function (e) {
         //console.log("onTouchMove",Laya.stage.mouseX,Laya.stage.mouseY);
         var mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
-        var curCell = this.PosPointToCell(mzPos);
-        for (var i = 0; i < this.pathArr.length; i++) {
-            var element = this.pathArr[i];
-            if (element.col == curCell.col && element.row == curCell.row) {
-                return;
+        var nextCell = this.PosPointToCell(mzPos);
+        var curCell = this.pathArr.pop() || this.ownerPlayer.GetCurCell();
+        this.pathArr.push(curCell);
+        if (this.CheckValidStep(curCell, nextCell)) {
+            if (!nextCell.Equal(curCell)) {
+                this.pathArr.push(nextCell);
+                this.drawPathByCell(nextCell);
             }
         }
-        this.pathArr.push(curCell);
-    };
-    Maze.prototype.convertPosToMaze = function (x, y) {
-        return new Laya.Point(x - this.x > 0 ? x - this.x : 0, y - this.y > 0 ? y - this.y : 0);
     };
     Maze.mzBgUrl = "gameui/brickbg.png";
-    Maze.mzWallColor = "#ffffff";
+    Maze.mzWallColor = "#734d26";
     Maze.mzWallWidth = 8;
     return Maze;
 }(Laya.Sprite));
@@ -53844,16 +53887,22 @@ var Player = /** @class */ (function (_super) {
         _this.loadImage(Player.plBgUrl);
         _this.maze.addChild(_this);
         _this.pivot(_this.width * 0.5, _this.height * 0.5).scale(0.5, 0.5);
-        _this.SetPlayerMazePosByCell(_this.data.mazePos);
+        _this.RefreshMazePos();
         return _this;
     }
-    Player.prototype.SetPlayerMazePos = function (c, r) {
-        var pos = this.maze.CellParamsToPos(c, r);
+    Player.prototype.RefreshMazePos = function () {
+        var pos = this.maze.CellToPos(this.data.mazePos);
         this.pos(pos.x, pos.y);
     };
-    Player.prototype.SetPlayerMazePosByCell = function (cell) {
-        var pos = this.maze.CellToPos(cell);
-        this.pos(pos.x, pos.y);
+    Player.prototype.SetCurCellByParams = function (c, r) {
+        this.data.mazePos.col = c || 0;
+        this.data.mazePos.row = r || 0;
+    };
+    Player.prototype.SetCurCell = function (cell) {
+        this.data.mazePos = cell;
+    };
+    Player.prototype.GetCurCell = function () {
+        return this.data.mazePos;
     };
     Player.plBgUrl = "gameui/player.png";
     return Player;

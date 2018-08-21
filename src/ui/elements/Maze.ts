@@ -62,9 +62,9 @@ class Maze extends Laya.Sprite {
     public CheckValidStep(cur: MazeCell, next: MazeCell) {
         let dr = next.row - cur.row;
         let dc = next.col - cur.col;
-        console.log(dc, dr)
+        //console.log(dc, dr)
         if ((!!dr == !!dc) || Math.abs(dc) > 1 || Math.abs(dr) > 1) {
-            console.log("false", dc, dr)
+            //console.log("false", dc, dr)
             return false;
         }
         let mazeArr = this.data.mazeArr;
@@ -82,6 +82,16 @@ class Maze extends Laya.Sprite {
             return false;
         }
         return true;
+    }
+
+    private convertPosToMaze(x, y) {
+        let rx = x - this.x;
+        rx = rx > 0 ? rx : 0;
+        rx = rx - this.width > 0 ? this.width : rx;
+        let ry = y - this.y;
+        ry = ry > 0 ? ry : 0;
+        ry = rx - this.height > 0 ? this.height : ry;
+        return new Laya.Point(rx, ry);
     }
 
     ///Drawing
@@ -150,11 +160,13 @@ class Maze extends Laya.Sprite {
     }
 
     private drawPathByCell(cell: MazeCell) {
-
+        this.drawPathByCellParam(cell.col, cell.row);
     }
 
     private drawPathByCellParam(col: number, row: number) {
-
+        let cW = this.CellWidth;
+        let cH = this.CellHeight;
+        this.graphics.drawRect(col * cW + 10, row * cH + 10, cW - 20, cH - 20, "#ffffff");
     }
 
     ///Event Handlers
@@ -198,17 +210,8 @@ class Maze extends Laya.Sprite {
         if (this.CheckValidStep(curCell, nextCell)) {
             if (!nextCell.Equal(curCell)) {
                 this.pathArr.push(nextCell);
+                this.drawPathByCell(nextCell);
             }
         }
-    }
-
-    private convertPosToMaze(x, y) {
-        let rx = x - this.x;
-        rx = rx > 0 ? rx : 0;
-        rx = rx - this.width > 0 ? this.width : rx;
-        let ry = y - this.y;
-        ry = ry > 0 ? ry : 0;
-        ry = rx - this.height > 0 ? this.height : ry;
-        return new Laya.Point(rx, ry);
     }
 }
