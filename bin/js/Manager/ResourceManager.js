@@ -5,7 +5,7 @@ var ResType;
 })(ResType || (ResType = {}));
 var ResourceManager = /** @class */ (function () {
     function ResourceManager() {
-        this.DATA_PATH = "res/data/l1.json";
+        //private DATA_PATH: string = "res/data/l1.json";
         this.UI_TEXTURE_PATH = "res/atlas/gameui.atlas";
         this.UI_IMG_PATH = "res/atlas/gameui.png";
         this.resArr = [];

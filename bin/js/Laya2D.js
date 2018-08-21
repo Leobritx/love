@@ -18,7 +18,7 @@ var GameApp = /** @class */ (function () {
         ResourceManager.Instance.Load(Laya.Handler.create(this, this.onloaded));
     }
     GameApp.prototype.onloaded = function () {
-        UIManager.Instance.openUI(UIType.MainView);
+        UIManager.Instance.OpenUI(UIType.MainView);
     };
     return GameApp;
 }());

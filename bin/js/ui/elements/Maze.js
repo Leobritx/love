@@ -28,8 +28,6 @@ var Maze = /** @class */ (function (_super) {
         _this.ownerPlayer = new Player(_this, MazeData.COLUMN_NUM - 1, MazeData.ROW_NUM - 1);
         _this.otherPlayer = new Player(_this, 0, 0);
         _this.ownerPlayer.on(Laya.Event.MOUSE_DOWN, _this, _this.onTouchDown);
-        var fps = 60; //帧率
-        var deltaTime = 1000 / fps;
         Laya.timer.loop(500, _this, _this.update);
         _this.DrawWalls();
         return _this;

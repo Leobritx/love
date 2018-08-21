@@ -14,7 +14,7 @@ var UIManager = /** @class */ (function () {
         this.viewMap[UIType.MainView] = function () { return new MainView(); };
         this.viewMap[UIType.GameView] = function () { return new GameView(); };
     }
-    UIManager.prototype.openUI = function (type, obj, call) {
+    UIManager.prototype.OpenUI = function (type, obj, call) {
         if (obj === void 0) { obj = null; }
         if (call === void 0) { call = null; }
         var hide = false;
@@ -52,7 +52,7 @@ var UIManager = /** @class */ (function () {
         ui.open(obj, new Laya.Handler(this, this.onOpen, [ui, call]));
         this.openArray.push(ui);
     };
-    UIManager.prototype.hideUI = function (type) {
+    UIManager.prototype.HideUI = function (type) {
         var ui = null;
         var index;
         for (var i = 0; i < this.openArray.length; i++) {
@@ -66,15 +66,15 @@ var UIManager = /** @class */ (function () {
             this.hideArray.push(ui);
         }
     };
-    UIManager.prototype.switchUI = function (type, obj, call) {
+    UIManager.prototype.SwitchUI = function (type, obj, call) {
         if (obj === void 0) { obj = null; }
         if (call === void 0) { call = null; }
         var topUi = this.openArray.pop();
         topUi.hide();
-        this.openUI(type, obj, call);
+        this.OpenUI(type, obj, call);
     };
     //获取已经打开的UI
-    UIManager.prototype.getUI = function (type) {
+    UIManager.prototype.GetUI = function (type) {
         for (var i = 0; i < this.openArray.length; i++) {
             if (this.openArray[i].type == type)
                 return this.openArray[i];

@@ -63,33 +63,33 @@ var GameConfig = /** @class */ (function () {
 }());
 var SettingManager = /** @class */ (function () {
     function SettingManager() {
-        this.configArr = [];
+        this.configMap = [];
         SettingManager.Instance = this;
         //配置实例化
-        this.configArr[ConfigType.Resolution] = new ResolutionConfig();
-        this.configArr[ConfigType.Language] = new LanguageConfig();
-        this.configArr[ConfigType.Volume] = new VolumeConfig();
-        this.configArr[ConfigType.Game] = new GameConfig();
+        this.configMap[ConfigType.Resolution] = new ResolutionConfig();
+        this.configMap[ConfigType.Language] = new LanguageConfig();
+        this.configMap[ConfigType.Volume] = new VolumeConfig();
+        this.configMap[ConfigType.Game] = new GameConfig();
     }
     SettingManager.prototype.Set = function (type) {
         if (!type) {
-            for (var index = 0; index < this.configArr.length; index++) {
-                var element = this.configArr[index];
+            for (var index = 0; index < this.configMap.length; index++) {
+                var element = this.configMap[index];
                 element.Set();
             }
             return;
         }
-        this.configArr[type].Set();
+        this.configMap[type].Set();
     };
     SettingManager.prototype.Get = function (type) {
         if (!type) {
-            for (var index = 0; index < this.configArr.length; index++) {
-                var element = this.configArr[index];
+            for (var index = 0; index < this.configMap.length; index++) {
+                var element = this.configMap[index];
                 element.Get();
             }
             return;
         }
-        this.configArr[type].Get();
+        this.configMap[type].Get();
     };
     return SettingManager;
 }());

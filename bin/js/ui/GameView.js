@@ -24,8 +24,9 @@ var GameView = /** @class */ (function (_super) {
     GameView.prototype.init = function () {
         Laya.stage.bgColor = "#f8d3e5";
         //添加迷宫
-        var maze = new Maze(0, 200, 600, 600);
-        this.addChild(maze);
+        this.curMaze = new Maze(0, 200, 600, 600);
+        this.addChild(this.curMaze);
+        new GameManager(this);
     };
     //UIBase接口
     GameView.prototype.open = function (obj, call) {

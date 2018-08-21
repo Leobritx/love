@@ -29,7 +29,7 @@ var MainView = /** @class */ (function (_super) {
         this.imgAvatar.loadImage("gameui/brick.png");
     };
     MainView.prototype.onMouseDown = function (e) {
-        UIManager.Instance.switchUI(UIType.GameView);
+        UIManager.Instance.SwitchUI(UIType.GameView);
     };
     //UIBase接口
     MainView.prototype.open = function (obj, call) {
