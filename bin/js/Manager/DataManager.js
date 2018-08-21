@@ -9,9 +9,7 @@ var DataManager = /** @class */ (function () {
         this.dataArr = [];
         DataManager.Instance = this;
     }
-    DataManager.prototype.Get = function (type, obj, call) {
-        if (obj === void 0) { obj = null; }
-        if (call === void 0) { call = null; }
+    DataManager.prototype.Get = function (type) {
     };
     return DataManager;
 }());

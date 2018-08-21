@@ -22,7 +22,7 @@ var GameView = /** @class */ (function (_super) {
         return _this;
     }
     GameView.prototype.init = function () {
-        Laya.stage.bgColor = "#959595";
+        Laya.stage.bgColor = "#f8d3e5";
         //添加迷宫
         var maze = new Maze(0, 200, 600, 600);
         this.addChild(maze);

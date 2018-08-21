@@ -25,16 +25,16 @@ class UIManager {
     private openArray: UIBase[] = [];
     private hideArray: UIBase[] = [];
 
-    private viewMap : any = [];
+    private viewMap: any = [];
 
     constructor() {
         UIManager.Instance = this;
         //将View做一个映射
-        this.viewMap[UIType.MainView] = ()=>{return new MainView();};
-        this.viewMap[UIType.GameView] = ()=>{return new GameView();};
+        this.viewMap[UIType.MainView] = () => { return new MainView(); };
+        this.viewMap[UIType.GameView] = () => { return new GameView(); };
     }
 
-    public openUI(type: UIType, obj: any[] = null, call: Laya.Handler = null) {
+    public OpenUI(type: UIType, obj: any[] = null, call: Laya.Handler = null) {
         let hide: boolean = false;
         let ui: UIBase;
         let index: number;
@@ -74,7 +74,7 @@ class UIManager {
         this.openArray.push(ui);
     }
 
-    public hideUI(type: UIType) {
+    public HideUI(type: UIType) {
         let ui = null;
         let index: number;
         for (let i = 0; i < this.openArray.length; i++) {
@@ -89,14 +89,14 @@ class UIManager {
         }
     }
 
-    public switchUI(type: UIType, obj: any[] = null, call: Laya.Handler = null) {
+    public SwitchUI(type: UIType, obj: any[] = null, call: Laya.Handler = null) {
         var topUi = this.openArray.pop();
         topUi.hide();
-        this.openUI(type, obj, call);
+        this.OpenUI(type, obj, call);
 
     }
     //获取已经打开的UI
-    public getUI(type: UIType): UIBase {
+    public GetUI(type: UIType): UIBase {
         for (let i = 0; i < this.openArray.length; i++) {
             if (this.openArray[i].type == type)
                 return this.openArray[i];

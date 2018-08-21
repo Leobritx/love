@@ -12,7 +12,6 @@ var MazeData = /** @class */ (function () {
     function MazeData() {
         MazeData.COLUMN_NUM = GameConfig.Instance.mazecolnum || MazeData.COLUMN_NUM;
         MazeData.ROW_NUM = GameConfig.Instance.mazerownum || MazeData.ROW_NUM;
-        console.log(MazeData.ROW_NUM);
         //初始化迷宫
         this.initArr();
         this.initMaze();

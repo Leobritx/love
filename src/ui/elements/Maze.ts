@@ -32,8 +32,6 @@ class Maze extends Laya.Sprite {
 
         this.ownerPlayer.on(Laya.Event.MOUSE_DOWN, this, this.onTouchDown);
 
-        let fps = 60;//帧率
-        let deltaTime = 1000 / fps;
         Laya.timer.loop(500, this, this.update);
 
         this.DrawWalls();

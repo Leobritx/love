@@ -14,7 +14,7 @@ enum ResType {
 class ResourceManager {
     public static Instance: ResourceManager;
 
-    private DATA_PATH: string = "res/data/l1.json";
+    //private DATA_PATH: string = "res/data/l1.json";
     private UI_TEXTURE_PATH: string = "res/atlas/gameui.atlas";
     private UI_IMG_PATH: string = "res/atlas/gameui.png";
 

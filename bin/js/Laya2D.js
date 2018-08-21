@@ -16,8 +16,6 @@ var GameApp = /** @class */ (function () {
         new UIManager();
         SettingManager.Instance.Get();
         ResourceManager.Instance.Load(Laya.Handler.create(this, this.onloaded));
-        GameConfig.Instance.mazecolnum = 8;
-        GameConfig.Instance.mazerownum = 8;
     }
     GameApp.prototype.onloaded = function () {
         UIManager.Instance.openUI(UIType.MainView);

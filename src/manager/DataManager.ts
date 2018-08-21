@@ -22,7 +22,7 @@ class DataManager {
 
     }
 
-    public Get(type: ResType, obj: any[] = null, call: Laya.Handler = null) {
+    public Get(type: ResType) {
 
     }
 }

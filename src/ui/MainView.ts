@@ -18,7 +18,7 @@ class MainView extends ui.UI.MainPageUI implements UIBase {
 
 
     private onMouseDown(e) {
-        UIManager.Instance.switchUI(UIType.GameView);
+        UIManager.Instance.SwitchUI(UIType.GameView);
     }
 
     //UIBase接口

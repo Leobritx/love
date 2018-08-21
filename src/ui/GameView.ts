@@ -2,17 +2,22 @@
 class GameView extends ui.UI.GamePageUI implements UIBase {
     //定义UI类型
     type: UIType = UIType.GameView;
+
+    private curMaze : Maze;
+
     constructor() {
         super();
         this.init();
     }
 
     public init(): void {
-        Laya.stage.bgColor = "#959595";
+        Laya.stage.bgColor = "#f8d3e5";
 
         //添加迷宫
-        let maze = new Maze(0, 200, 600, 600);
-        this.addChild(maze);
+        this.curMaze = new Maze(0, 200, 600, 600);
+        this.addChild(this.curMaze);
+        
+        new GameManager(this);
     }
 
     //UIBase接口

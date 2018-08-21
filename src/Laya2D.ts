@@ -25,7 +25,7 @@ class GameApp {
 		ResourceManager.Instance.Load(Laya.Handler.create(this, this.onloaded));
 	}
 	public onloaded(): void {
-		UIManager.Instance.openUI(UIType.MainView);
+		UIManager.Instance.OpenUI(UIType.MainView);
 	}
 }
 new GameApp();

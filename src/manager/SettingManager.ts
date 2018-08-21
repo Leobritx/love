@@ -95,37 +95,37 @@ class GameConfig implements ConfigBase {
 class SettingManager {
     public static Instance: SettingManager;
 
-    private configArr: ConfigBase[] = [];
+    private configMap: ConfigBase[] = [];
 
     constructor() {
         SettingManager.Instance = this;
 
         //配置实例化
-        this.configArr[ConfigType.Resolution] = new ResolutionConfig();
-        this.configArr[ConfigType.Language] = new LanguageConfig();
-        this.configArr[ConfigType.Volume] = new VolumeConfig();
-        this.configArr[ConfigType.Game] = new GameConfig();
+        this.configMap[ConfigType.Resolution] = new ResolutionConfig();
+        this.configMap[ConfigType.Language] = new LanguageConfig();
+        this.configMap[ConfigType.Volume] = new VolumeConfig();
+        this.configMap[ConfigType.Game] = new GameConfig();
     }
 
     public Set(type?: ConfigType) {
         if (!type) {
-            for (let index = 0; index < this.configArr.length; index++) {
-                let element = this.configArr[index];
+            for (let index = 0; index < this.configMap.length; index++) {
+                let element = this.configMap[index];
                 element.Set();
             }
             return;
         }
-        this.configArr[type].Set();
+        this.configMap[type].Set();
     }
 
     public Get(type?: ConfigType) {
         if (!type) {
-            for (let index = 0; index < this.configArr.length; index++) {
-                let element = this.configArr[index];
+            for (let index = 0; index < this.configMap.length; index++) {
+                let element = this.configMap[index];
                 element.Get();
             }
             return;
         }
-        this.configArr[type].Get();
+        this.configMap[type].Get();
     }
 }
