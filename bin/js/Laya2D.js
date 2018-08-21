@@ -10,11 +10,14 @@ var GameApp = /** @class */ (function () {
         Laya.stage.alignH = "center";
         Laya.stage.frameRate = Laya.Stage.FRAME_MOUSE;
         //管理器
-        new UIManager();
+        new SettingManager();
         new ResourceManager();
         new DataManager();
-        new SettingManager();
+        new UIManager();
+        SettingManager.Instance.Get();
         ResourceManager.Instance.Load(Laya.Handler.create(this, this.onloaded));
+        GameConfig.Instance.mazecolnum = 8;
+        GameConfig.Instance.mazerownum = 8;
     }
     GameApp.prototype.onloaded = function () {
         UIManager.Instance.openUI(UIType.MainView);

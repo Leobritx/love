@@ -13,12 +13,14 @@ class MazeCell {
 }
 
 class MazeData {
-    public static ROW_NUM = 10;
     public static COLUMN_NUM = 10;
+    public static ROW_NUM = 10;
 
     public mazeArr: any[];
 
     constructor() {
+        MazeData.COLUMN_NUM = GameConfig.Instance.mazecolnum || MazeData.COLUMN_NUM;
+        MazeData.ROW_NUM = GameConfig.Instance.mazerownum || MazeData.ROW_NUM;
         //初始化迷宫
         this.initArr();
         this.initMaze();

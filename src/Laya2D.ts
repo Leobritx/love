@@ -16,13 +16,13 @@ class GameApp {
 		Laya.stage.frameRate = Laya.Stage.FRAME_MOUSE;
 
 		//管理器
-		new UIManager();
+		new SettingManager();
 		new ResourceManager();
 		new DataManager();
-		new SettingManager();
+		new UIManager();
 
+		SettingManager.Instance.Get();
 		ResourceManager.Instance.Load(Laya.Handler.create(this, this.onloaded));
-
 	}
 	public onloaded(): void {
 		UIManager.Instance.openUI(UIType.MainView);

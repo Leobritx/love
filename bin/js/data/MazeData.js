@@ -10,6 +10,9 @@ var MazeCell = /** @class */ (function () {
 }());
 var MazeData = /** @class */ (function () {
     function MazeData() {
+        MazeData.COLUMN_NUM = GameConfig.Instance.mazecolnum || MazeData.COLUMN_NUM;
+        MazeData.ROW_NUM = GameConfig.Instance.mazerownum || MazeData.ROW_NUM;
+        console.log(MazeData.ROW_NUM);
         //初始化迷宫
         this.initArr();
         this.initMaze();
@@ -79,8 +82,8 @@ var MazeData = /** @class */ (function () {
         this.mazeArr[0][0][1] = 1;
         this.mazeArr[MazeData.COLUMN_NUM - 1][MazeData.ROW_NUM - 1][3] = 1;
     };
-    MazeData.ROW_NUM = 10;
     MazeData.COLUMN_NUM = 10;
+    MazeData.ROW_NUM = 10;
     return MazeData;
 }());
 //# sourceMappingURL=MazeData.js.map
