@@ -181,6 +181,9 @@ var Maze = /** @class */ (function (_super) {
         //this.ownerPlayer.off(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
     };
     Maze.prototype.onTouchMove = function (e) {
+        if (Laya.timer.currFrame % 5 != 0) {
+            return;
+        }
         //console.log("onTouchMove",Laya.stage.mouseX,Laya.stage.mouseY);
         var mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
         var nextCell = this.PosPointToCell(mzPos);

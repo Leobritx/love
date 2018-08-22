@@ -1,24 +1,26 @@
 var ConfigType;
 (function (ConfigType) {
-    ConfigType[ConfigType["Resolution"] = 0] = "Resolution";
+    ConfigType[ConfigType["Display"] = 0] = "Display";
     ConfigType[ConfigType["Language"] = 1] = "Language";
     ConfigType[ConfigType["Volume"] = 2] = "Volume";
     ConfigType[ConfigType["Game"] = 3] = "Game";
 })(ConfigType || (ConfigType = {}));
-var ResolutionConfig = /** @class */ (function () {
-    function ResolutionConfig() {
-        this.type = ConfigType.Resolution;
-        ResolutionConfig.Instance = this;
+var DisplayConfig = /** @class */ (function () {
+    function DisplayConfig() {
+        this.type = ConfigType.Display;
+        DisplayConfig.Instance = this;
     }
-    ResolutionConfig.prototype.Get = function () {
+    DisplayConfig.prototype.Get = function () {
         this.width = parseInt(Laya.LocalStorage.getItem("width"));
         this.height = parseInt(Laya.LocalStorage.getItem("height"));
+        this.fps = parseInt(Laya.LocalStorage.getItem("fps"));
     };
-    ResolutionConfig.prototype.Set = function () {
+    DisplayConfig.prototype.Set = function () {
         Laya.LocalStorage.setItem("width", this.width.toString());
         Laya.LocalStorage.setItem("height", this.height.toString());
+        Laya.LocalStorage.setItem("fps", this.fps.toString());
     };
-    return ResolutionConfig;
+    return DisplayConfig;
 }());
 var VolumeConfig = /** @class */ (function () {
     function VolumeConfig() {
@@ -66,7 +68,7 @@ var SettingManager = /** @class */ (function () {
         this.configMap = [];
         SettingManager.Instance = this;
         //配置实例化
-        this.configMap[ConfigType.Resolution] = new ResolutionConfig();
+        this.configMap[ConfigType.Display] = new DisplayConfig();
         this.configMap[ConfigType.Language] = new LanguageConfig();
         this.configMap[ConfigType.Volume] = new VolumeConfig();
         this.configMap[ConfigType.Game] = new GameConfig();

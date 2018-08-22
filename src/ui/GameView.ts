@@ -3,7 +3,7 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
     //定义UI类型
     type: UIType = UIType.GameView;
 
-    private curMaze : Maze;
+    private curMaze: Maze;
 
     constructor() {
         super();
@@ -16,8 +16,15 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
         //添加迷宫
         this.curMaze = new Maze(0, 200, 600, 600);
         this.addChild(this.curMaze);
-        
+
         new GameManager(this);
+        GameManager.Instance.SwitchState(StateType.Init);
+
+        Laya.timer.loop(1000 / (DisplayConfig.Instance.fps || 30), this, this.update);
+    }
+
+    public update(e) {
+        GameManager.Instance.UpdateCurState();
     }
 
     //UIBase接口

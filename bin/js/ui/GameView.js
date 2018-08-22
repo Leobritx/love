@@ -27,6 +27,11 @@ var GameView = /** @class */ (function (_super) {
         this.curMaze = new Maze(0, 200, 600, 600);
         this.addChild(this.curMaze);
         new GameManager(this);
+        GameManager.Instance.SwitchState(StateType.Init);
+        Laya.timer.loop(1000 / (DisplayConfig.Instance.fps || 30), this, this.update);
+    };
+    GameView.prototype.update = function (e) {
+        GameManager.Instance.UpdateCurState();
     };
     //UIBase接口
     GameView.prototype.open = function (obj, call) {

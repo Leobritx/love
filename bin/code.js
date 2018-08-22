@@ -53409,24 +53409,6 @@ if (typeof define === 'function' && define.amd){
     });
 }
 //# sourceMappingURL=Structs.js.map
-var ConfigType;
-(function (ConfigType) {
-    ConfigType[ConfigType["Resolution"] = 0] = "Resolution";
-    ConfigType[ConfigType["Language"] = 1] = "Language";
-    ConfigType[ConfigType["Volume"] = 2] = "Volume";
-})(ConfigType || (ConfigType = {}));
-var SettingManager = /** @class */ (function () {
-    function SettingManager() {
-        this.configArr = [];
-        SettingManager.Instance = this;
-    }
-    SettingManager.prototype.Set = function (type, obj, call) {
-        if (obj === void 0) { obj = null; }
-        if (call === void 0) { call = null; }
-    };
-    return SettingManager;
-}());
-//# sourceMappingURL=SettingManager.js.map
 var ResType;
 (function (ResType) {
     ResType[ResType["Image"] = 0] = "Image";
@@ -53434,7 +53416,7 @@ var ResType;
 })(ResType || (ResType = {}));
 var ResourceManager = /** @class */ (function () {
     function ResourceManager() {
-        this.DATA_PATH = "res/data/l1.json";
+        //private DATA_PATH: string = "res/data/l1.json";
         this.UI_TEXTURE_PATH = "res/atlas/gameui.atlas";
         this.UI_IMG_PATH = "res/atlas/gameui.png";
         this.resArr = [];
@@ -53456,7 +53438,6 @@ var ResourceManager = /** @class */ (function () {
     return ResourceManager;
 }());
 //# sourceMappingURL=ResourceManager.js.map
-//# sourceMappingURL=GameManager.js.map
 var DataType;
 (function (DataType) {
     DataType[DataType["OwnerPlayer"] = 0] = "OwnerPlayer";
@@ -53468,9 +53449,7 @@ var DataManager = /** @class */ (function () {
         this.dataArr = [];
         DataManager.Instance = this;
     }
-    DataManager.prototype.Get = function (type, obj, call) {
-        if (obj === void 0) { obj = null; }
-        if (call === void 0) { call = null; }
+    DataManager.prototype.Get = function (type) {
     };
     return DataManager;
 }());
@@ -53495,6 +53474,8 @@ var MazeCell = /** @class */ (function () {
 }());
 var MazeData = /** @class */ (function () {
     function MazeData() {
+        MazeData.COLUMN_NUM = GameConfig.Instance.mazecolnum || MazeData.COLUMN_NUM;
+        MazeData.ROW_NUM = GameConfig.Instance.mazerownum || MazeData.ROW_NUM;
         //初始化迷宫
         this.initArr();
         this.initMaze();
@@ -53564,11 +53545,178 @@ var MazeData = /** @class */ (function () {
         this.mazeArr[0][0][1] = 1;
         this.mazeArr[MazeData.COLUMN_NUM - 1][MazeData.ROW_NUM - 1][3] = 1;
     };
-    MazeData.ROW_NUM = 10;
-    MazeData.COLUMN_NUM = 10;
+    MazeData.COLUMN_NUM = 8;
+    MazeData.ROW_NUM = 8;
     return MazeData;
 }());
 //# sourceMappingURL=MazeData.js.map
+var StateType;
+(function (StateType) {
+    StateType[StateType["Init"] = 0] = "Init";
+    StateType[StateType["Prepare"] = 1] = "Prepare";
+    StateType[StateType["InGame"] = 2] = "InGame";
+    StateType[StateType["End"] = 3] = "End";
+})(StateType || (StateType = {}));
+var InitState = /** @class */ (function () {
+    function InitState(gv) {
+        this.gameView = gv;
+    }
+    InitState.prototype.enter = function () {
+        this.counter = 0;
+        console.log("InitState  enter!");
+    };
+    InitState.prototype.update = function () {
+        this.counter++;
+        if (this.counter > 2000) {
+            console.log("InitState  change to InGameState!");
+            GameManager.Instance.SwitchState(StateType.InGame);
+        }
+    };
+    InitState.prototype.exit = function () {
+        console.log("InitState  exit!");
+    };
+    return InitState;
+}());
+var InGameState = /** @class */ (function () {
+    function InGameState(gv) {
+        this.gameView = gv;
+    }
+    InGameState.prototype.enter = function () {
+        console.log("InGameState  enter!");
+    };
+    InGameState.prototype.update = function () {
+    };
+    InGameState.prototype.exit = function () {
+        console.log("InGameState  exit!");
+    };
+    return InGameState;
+}());
+var GameManager = /** @class */ (function () {
+    function GameManager(gv) {
+        this.stateMap = [];
+        GameManager.Instance = this;
+        this.stateMap[StateType.Init] = new InitState(gv);
+        this.stateMap[StateType.InGame] = new InGameState(gv);
+    }
+    GameManager.prototype.CurState = function () {
+        return this.curState;
+    };
+    GameManager.prototype.SwitchState = function (state) {
+        this.lastState = this.curState;
+        this.curState = state;
+        var last = this.stateMap[this.lastState];
+        var cur = this.stateMap[this.curState];
+        if (last) {
+            last.exit();
+        }
+        if (cur) {
+            cur.enter();
+        }
+    };
+    GameManager.prototype.UpdateCurState = function () {
+        this.stateMap[this.curState].update();
+    };
+    return GameManager;
+}());
+//# sourceMappingURL=GameManager.js.map
+var ConfigType;
+(function (ConfigType) {
+    ConfigType[ConfigType["Display"] = 0] = "Display";
+    ConfigType[ConfigType["Language"] = 1] = "Language";
+    ConfigType[ConfigType["Volume"] = 2] = "Volume";
+    ConfigType[ConfigType["Game"] = 3] = "Game";
+})(ConfigType || (ConfigType = {}));
+var DisplayConfig = /** @class */ (function () {
+    function DisplayConfig() {
+        this.type = ConfigType.Display;
+        DisplayConfig.Instance = this;
+    }
+    DisplayConfig.prototype.Get = function () {
+        this.width = parseInt(Laya.LocalStorage.getItem("width"));
+        this.height = parseInt(Laya.LocalStorage.getItem("height"));
+        this.fps = parseInt(Laya.LocalStorage.getItem("fps"));
+    };
+    DisplayConfig.prototype.Set = function () {
+        Laya.LocalStorage.setItem("width", this.width.toString());
+        Laya.LocalStorage.setItem("height", this.height.toString());
+        Laya.LocalStorage.setItem("fps", this.fps.toString());
+    };
+    return DisplayConfig;
+}());
+var VolumeConfig = /** @class */ (function () {
+    function VolumeConfig() {
+        this.type = ConfigType.Volume;
+        VolumeConfig.Instance = this;
+    }
+    VolumeConfig.prototype.Get = function () {
+        this.volume = parseInt(Laya.LocalStorage.getItem("volume"));
+    };
+    VolumeConfig.prototype.Set = function () {
+        Laya.LocalStorage.setItem("volume", this.volume.toString());
+    };
+    return VolumeConfig;
+}());
+var LanguageConfig = /** @class */ (function () {
+    function LanguageConfig() {
+        this.type = ConfigType.Language;
+        LanguageConfig.Instance = this;
+    }
+    LanguageConfig.prototype.Get = function () {
+        this.language = Laya.LocalStorage.getItem("language");
+    };
+    LanguageConfig.prototype.Set = function () {
+        Laya.LocalStorage.setItem("language", this.language);
+    };
+    return LanguageConfig;
+}());
+var GameConfig = /** @class */ (function () {
+    function GameConfig() {
+        this.type = ConfigType.Game;
+        GameConfig.Instance = this;
+    }
+    GameConfig.prototype.Get = function () {
+        this.mazecolnum = parseInt(Laya.LocalStorage.getItem("mazecolnum"));
+        this.mazerownum = parseInt(Laya.LocalStorage.getItem("mazerownum"));
+    };
+    GameConfig.prototype.Set = function () {
+        Laya.LocalStorage.setItem("mazecolnum", this.mazecolnum.toString());
+        Laya.LocalStorage.setItem("mazerownum", this.mazerownum.toString());
+    };
+    return GameConfig;
+}());
+var SettingManager = /** @class */ (function () {
+    function SettingManager() {
+        this.configMap = [];
+        SettingManager.Instance = this;
+        //配置实例化
+        this.configMap[ConfigType.Display] = new DisplayConfig();
+        this.configMap[ConfigType.Language] = new LanguageConfig();
+        this.configMap[ConfigType.Volume] = new VolumeConfig();
+        this.configMap[ConfigType.Game] = new GameConfig();
+    }
+    SettingManager.prototype.Set = function (type) {
+        if (!type) {
+            for (var index = 0; index < this.configMap.length; index++) {
+                var element = this.configMap[index];
+                element.Set();
+            }
+            return;
+        }
+        this.configMap[type].Set();
+    };
+    SettingManager.prototype.Get = function (type) {
+        if (!type) {
+            for (var index = 0; index < this.configMap.length; index++) {
+                var element = this.configMap[index];
+                element.Get();
+            }
+            return;
+        }
+        this.configMap[type].Get();
+    };
+    return SettingManager;
+}());
+//# sourceMappingURL=SettingManager.js.map
 var UIType;
 (function (UIType) {
     UIType[UIType["MainView"] = 0] = "MainView";
@@ -53585,7 +53733,7 @@ var UIManager = /** @class */ (function () {
         this.viewMap[UIType.MainView] = function () { return new MainView(); };
         this.viewMap[UIType.GameView] = function () { return new GameView(); };
     }
-    UIManager.prototype.openUI = function (type, obj, call) {
+    UIManager.prototype.OpenUI = function (type, obj, call) {
         if (obj === void 0) { obj = null; }
         if (call === void 0) { call = null; }
         var hide = false;
@@ -53623,7 +53771,7 @@ var UIManager = /** @class */ (function () {
         ui.open(obj, new Laya.Handler(this, this.onOpen, [ui, call]));
         this.openArray.push(ui);
     };
-    UIManager.prototype.hideUI = function (type) {
+    UIManager.prototype.HideUI = function (type) {
         var ui = null;
         var index;
         for (var i = 0; i < this.openArray.length; i++) {
@@ -53637,15 +53785,15 @@ var UIManager = /** @class */ (function () {
             this.hideArray.push(ui);
         }
     };
-    UIManager.prototype.switchUI = function (type, obj, call) {
+    UIManager.prototype.SwitchUI = function (type, obj, call) {
         if (obj === void 0) { obj = null; }
         if (call === void 0) { call = null; }
         var topUi = this.openArray.pop();
         topUi.hide();
-        this.openUI(type, obj, call);
+        this.OpenUI(type, obj, call);
     };
     //获取已经打开的UI
-    UIManager.prototype.getUI = function (type) {
+    UIManager.prototype.GetUI = function (type) {
         for (var i = 0; i < this.openArray.length; i++) {
             if (this.openArray[i].type == type)
                 return this.openArray[i];
@@ -53692,8 +53840,6 @@ var Maze = /** @class */ (function (_super) {
         _this.ownerPlayer = new Player(_this, MazeData.COLUMN_NUM - 1, MazeData.ROW_NUM - 1);
         _this.otherPlayer = new Player(_this, 0, 0);
         _this.ownerPlayer.on(Laya.Event.MOUSE_DOWN, _this, _this.onTouchDown);
-        var fps = 60; //帧率
-        var deltaTime = 1000 / fps;
         Laya.timer.loop(500, _this, _this.update);
         _this.DrawWalls();
         return _this;
@@ -53847,6 +53993,9 @@ var Maze = /** @class */ (function (_super) {
         //this.ownerPlayer.off(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
     };
     Maze.prototype.onTouchMove = function (e) {
+        if (Laya.timer.currFrame % 5 != 0) {
+            return;
+        }
         //console.log("onTouchMove",Laya.stage.mouseX,Laya.stage.mouseY);
         var mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
         var nextCell = this.PosPointToCell(mzPos);
@@ -53985,10 +54134,16 @@ var GameView = /** @class */ (function (_super) {
         return _this;
     }
     GameView.prototype.init = function () {
-        Laya.stage.bgColor = "#959595";
+        Laya.stage.bgColor = "#f8d3e5";
         //添加迷宫
-        var maze = new Maze(0, 200, 600, 600);
-        this.addChild(maze);
+        this.curMaze = new Maze(0, 200, 600, 600);
+        this.addChild(this.curMaze);
+        new GameManager(this);
+        GameManager.Instance.SwitchState(StateType.Init);
+        Laya.timer.loop(1000 / (DisplayConfig.Instance.fps || 30), this, this.update);
+    };
+    GameView.prototype.update = function (e) {
+        GameManager.Instance.UpdateCurState();
     };
     //UIBase接口
     GameView.prototype.open = function (obj, call) {
@@ -54035,11 +54190,11 @@ var MainView = /** @class */ (function (_super) {
         var Event = Laya.Event;
         //初始化背景颜色
         Laya.stage.bgColor = "#94deec";
-        this.btnStart.on(Event.MOUSE_DOWN, this, this.onMouseDown);
+        this.btnStart.on(Event.CLICK, this, this.onStartClick);
         this.imgAvatar.loadImage("gameui/brick.png");
     };
-    MainView.prototype.onMouseDown = function (e) {
-        UIManager.Instance.switchUI(UIType.GameView);
+    MainView.prototype.onStartClick = function (e) {
+        UIManager.Instance.SwitchUI(UIType.GameView);
     };
     //UIBase接口
     MainView.prototype.open = function (obj, call) {
@@ -54066,22 +54221,23 @@ var MainView = /** @class */ (function (_super) {
 var GameApp = /** @class */ (function () {
     function GameApp() {
         GameApp.Instance = this;
+        //管理器
+        new SettingManager();
+        new ResourceManager();
+        new DataManager();
+        new UIManager();
         //初始化引擎
         Laya.MiniAdpter.init();
-        Laya.init(600, 1000, Laya.WebGL);
+        Laya.init(DisplayConfig.Instance.width || 600, DisplayConfig.Instance.height || 1000, Laya.WebGL);
         //设置适配模式
         Laya.stage.scaleMode = "showall";
         Laya.stage.alignH = "center";
         Laya.stage.frameRate = Laya.Stage.FRAME_MOUSE;
-        //管理器
-        new UIManager();
-        new ResourceManager();
-        new DataManager();
-        new SettingManager();
+        SettingManager.Instance.Get();
         ResourceManager.Instance.Load(Laya.Handler.create(this, this.onloaded));
     }
     GameApp.prototype.onloaded = function () {
-        UIManager.Instance.openUI(UIType.MainView);
+        UIManager.Instance.OpenUI(UIType.MainView);
     };
     return GameApp;
 }());

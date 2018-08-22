@@ -81,8 +81,8 @@ var MazeData = /** @class */ (function () {
         this.mazeArr[0][0][1] = 1;
         this.mazeArr[MazeData.COLUMN_NUM - 1][MazeData.ROW_NUM - 1][3] = 1;
     };
-    MazeData.COLUMN_NUM = 10;
-    MazeData.ROW_NUM = 10;
+    MazeData.COLUMN_NUM = 8;
+    MazeData.ROW_NUM = 8;
     return MazeData;
 }());
 //# sourceMappingURL=MazeData.js.map

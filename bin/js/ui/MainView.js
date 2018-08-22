@@ -25,10 +25,10 @@ var MainView = /** @class */ (function (_super) {
         var Event = Laya.Event;
         //初始化背景颜色
         Laya.stage.bgColor = "#94deec";
-        this.btnStart.on(Event.MOUSE_DOWN, this, this.onMouseDown);
+        this.btnStart.on(Event.CLICK, this, this.onStartClick);
         this.imgAvatar.loadImage("gameui/brick.png");
     };
-    MainView.prototype.onMouseDown = function (e) {
+    MainView.prototype.onStartClick = function (e) {
         UIManager.Instance.SwitchUI(UIType.GameView);
     };
     //UIBase接口

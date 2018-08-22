@@ -200,6 +200,9 @@ class Maze extends Laya.Sprite {
     }
 
     private onTouchMove(e) {
+        if (Laya.timer.currFrame % 5 != 0) {
+            return;
+        }
         //console.log("onTouchMove",Laya.stage.mouseX,Laya.stage.mouseY);
         let mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
         let nextCell = this.PosPointToCell(mzPos);

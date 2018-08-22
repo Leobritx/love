@@ -8,30 +8,33 @@ interface ConfigBase {
 }
 
 enum ConfigType {
-    Resolution, //分辨率
+    Display,    //显示
     Language,   //语言
     Volume,     //音量
     Game,
 }
 
-class ResolutionConfig implements ConfigBase {
-    public static Instance: ResolutionConfig;
-    type: ConfigType = ConfigType.Resolution;
+class DisplayConfig implements ConfigBase {
+    public static Instance: DisplayConfig;
+    type: ConfigType = ConfigType.Display;
 
     public width: number;
     public height: number;
+    public fps: number;
 
     constructor() {
-        ResolutionConfig.Instance = this;
+        DisplayConfig.Instance = this;
     }
 
     public Get() {
         this.width = parseInt(Laya.LocalStorage.getItem("width"));
         this.height = parseInt(Laya.LocalStorage.getItem("height"));
+        this.fps = parseInt(Laya.LocalStorage.getItem("fps"));
     }
     public Set() {
         Laya.LocalStorage.setItem("width", this.width.toString());
         Laya.LocalStorage.setItem("height", this.height.toString());
+        Laya.LocalStorage.setItem("fps", this.fps.toString());
     }
 }
 
@@ -101,7 +104,7 @@ class SettingManager {
         SettingManager.Instance = this;
 
         //配置实例化
-        this.configMap[ConfigType.Resolution] = new ResolutionConfig();
+        this.configMap[ConfigType.Display] = new DisplayConfig();
         this.configMap[ConfigType.Language] = new LanguageConfig();
         this.configMap[ConfigType.Volume] = new VolumeConfig();
         this.configMap[ConfigType.Game] = new GameConfig();

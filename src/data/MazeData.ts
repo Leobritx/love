@@ -13,8 +13,8 @@ class MazeCell {
 }
 
 class MazeData {
-    public static COLUMN_NUM = 10;
-    public static ROW_NUM = 10;
+    public static COLUMN_NUM = 8;
+    public static ROW_NUM = 8;
 
     public mazeArr: any[];
 
