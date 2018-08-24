@@ -27,9 +27,13 @@ var MainView = /** @class */ (function (_super) {
         Laya.stage.bgColor = "#94deec";
         this.btnStart.on(Event.CLICK, this, this.onStartClick);
         this.imgAvatar.loadImage("gameui/brick.png");
+        this.btnSetting.on(Event.CLICK, this, this.onSettingClick);
     };
     MainView.prototype.onStartClick = function (e) {
         UIManager.Instance.SwitchUI(UIType.GameView);
+    };
+    MainView.prototype.onSettingClick = function (e) {
+        this.addChild(new SettingDialog());
     };
     //UIBase接口
     MainView.prototype.open = function (obj, call) {

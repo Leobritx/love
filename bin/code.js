@@ -53567,6 +53567,7 @@ var InitState = /** @class */ (function () {
     };
     InitState.prototype.update = function () {
         this.counter++;
+        this.gameView.SetTimer(this.counter);
         if (this.counter > 2000) {
             console.log("InitState  change to InGameState!");
             GameManager.Instance.SwitchState(StateType.InGame);
@@ -54085,7 +54086,7 @@ var ui;
                 _super.prototype.createChildren.call(this);
                 this.createView(ui.UI.GamePageUI.uiView);
             };
-            GamePageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 } };
+            GamePageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 }, "child": [{ "type": "Label", "props": { "y": 100, "width": 300, "var": "lblTimer", "text": "当前阶段", "height": 30, "fontSize": 28, "font": "Arial", "color": "#10aebc", "centerX": 0, "align": "center" } }] };
             return GamePageUI;
         }(View));
         UI.GamePageUI = GamePageUI;
@@ -54145,6 +54146,9 @@ var GameView = /** @class */ (function (_super) {
     GameView.prototype.update = function (e) {
         GameManager.Instance.UpdateCurState();
     };
+    GameView.prototype.SetTimer = function (count) {
+        this.lblTimer.text = count.toString();
+    };
     //UIBase接口
     GameView.prototype.open = function (obj, call) {
         //初始化UI，数据加载    
@@ -54155,8 +54159,10 @@ var GameView = /** @class */ (function (_super) {
         }
     };
     GameView.prototype.close = function () {
+        this.removeSelf();
     };
     GameView.prototype.hide = function () {
+        this.visible = false;
     };
     GameView.prototype.show = function () {
     };

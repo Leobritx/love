@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":45,
+    "selecteID":48,
     "props":{"width":600,"sceneColor":"#94deec","height":1000},
     "nodeParent":-1,
     "label":"View",
@@ -36,6 +36,19 @@
             "isAniNode":true,
             "hasChild":false,
             "compId":45,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Image",
+            "props":{"y":920,"x":520,"width":80,"var":"btnSetting","skin":"gameui/setting.png","height":80},
+            "nodeParent":1,
+            "label":"Image(btnSetting)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":48,
             "child":[
                 ]
         }],

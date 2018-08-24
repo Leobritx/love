@@ -26,7 +26,7 @@ var ui;
                 _super.prototype.createChildren.call(this);
                 this.createView(ui.UI.GamePageUI.uiView);
             };
-            GamePageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 } };
+            GamePageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 }, "child": [{ "type": "Label", "props": { "y": 100, "width": 300, "var": "lblTimer", "text": "当前阶段", "height": 30, "fontSize": 28, "font": "Arial", "color": "#10aebc", "centerX": 0, "align": "center" } }] };
             return GamePageUI;
         }(View));
         UI.GamePageUI = GamePageUI;
@@ -44,10 +44,28 @@ var ui;
                 _super.prototype.createChildren.call(this);
                 this.createView(ui.UI.MainPageUI.uiView);
             };
-            MainPageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 }, "child": [{ "type": "Button", "props": { "y": 550, "x": 150, "width": 300, "var": "btnStart", "skin": "gameui/button.png", "labelSize": 40, "labelFont": "Microsoft YaHei", "label": "Start", "height": 100, "sizeGrid": "5,10,10,5" } }, { "type": "Image", "props": { "y": 300, "x": 225, "width": 150, "var": "imgAvatar", "height": 150 } }] };
+            MainPageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 }, "child": [{ "type": "Button", "props": { "y": 550, "x": 150, "width": 300, "var": "btnStart", "skin": "gameui/button.png", "labelSize": 40, "labelFont": "Microsoft YaHei", "label": "Start", "height": 100, "sizeGrid": "5,10,10,5" } }, { "type": "Image", "props": { "y": 300, "x": 225, "width": 150, "var": "imgAvatar", "height": 150 } }, { "type": "Image", "props": { "y": 920, "x": 520, "width": 80, "var": "btnSetting", "skin": "gameui/setting.png", "height": 80 } }] };
             return MainPageUI;
         }(View));
         UI.MainPageUI = MainPageUI;
+    })(UI = ui.UI || (ui.UI = {}));
+})(ui || (ui = {}));
+(function (ui) {
+    var UI;
+    (function (UI) {
+        var SettingDialogUI = /** @class */ (function (_super) {
+            __extends(SettingDialogUI, _super);
+            function SettingDialogUI() {
+                return _super.call(this) || this;
+            }
+            SettingDialogUI.prototype.createChildren = function () {
+                _super.prototype.createChildren.call(this);
+                this.createView(ui.UI.SettingDialogUI.uiView);
+            };
+            SettingDialogUI.uiView = { "type": "Dialog", "props": { "width": 400, "height": 360, "centerY": 0, "centerX": 0 }, "child": [{ "type": "Image", "props": { "y": 0, "x": 0, "width": 400, "skin": "gameui/brickbg.png", "height": 360, "sizeGrid": "2,2,2,2" } }, { "type": "Button", "props": { "width": 119, "var": "btnConfirm", "skin": "gameui/button.png", "label": "Confirm", "height": 37, "centerY": 120, "centerX": 0, "sizeGrid": "5,10,10,5" } }, { "type": "Button", "props": { "y": 1, "x": 368, "width": 30, "var": "btnClose", "skin": "gameui/button.png", "label": "X", "height": 28, "sizeGrid": "5,10,10,5" } }, { "type": "HSlider", "props": { "width": 312, "value": 50, "skin": "template/ScrollBar/BackProgressBar.png", "sizeGrid": "0,15,0,15", "height": 45, "centerY": 30, "centerX": 0 } }] };
+            return SettingDialogUI;
+        }(Dialog));
+        UI.SettingDialogUI = SettingDialogUI;
     })(UI = ui.UI || (ui.UI = {}));
 })(ui || (ui = {}));
 //# sourceMappingURL=layaUI.max.all.js.map

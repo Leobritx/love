@@ -10,7 +10,7 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
         this.init();
     }
 
-    public init(): void {
+    private init(): void {
         Laya.stage.bgColor = "#f8d3e5";
 
         //添加迷宫
@@ -23,9 +23,15 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
         Laya.timer.loop(1000 / (DisplayConfig.Instance.fps || 30), this, this.update);
     }
 
-    public update(e) {
+    private update(e) {
         GameManager.Instance.UpdateCurState();
     }
+
+    public SetTimer(count:number){
+        this.lblTimer.text = count.toString();
+    }
+
+
 
     //UIBase接口
     public open(obj: any[], call: Laya.Handler) {
@@ -36,15 +42,12 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
             call = null;
         }
     }
-
     public close() {
+        this.removeSelf();
     }
-
     public hide() {
-
+        this.visible = false;
     }
-
     public show() {
     }
-
 }

@@ -2,17 +2,29 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":7,
-    "props":{"width":600,"sceneColor":"#959595","height":1000},
+    "selecteID":1,
+    "props":{"width":600,"sceneColor":"#eab0ce","height":1000},
     "nodeParent":-1,
     "label":"View",
     "isOpen":true,
-    "isDirectory":false,
+    "isDirectory":true,
     "isAniNode":true,
-    "hasChild":false,
+    "hasChild":true,
     "compId":1,
     "child":[
-        ],
+        {
+            "x":15,
+            "type":"Label",
+            "props":{"y":100,"width":300,"var":"lblTimer","text":"当前阶段","height":30,"fontSize":28,"font":"Arial","color":"#10aebc","centerX":0,"align":"center"},
+            "nodeParent":1,
+            "label":"Label(lblTimer)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":2,
+            "child":[
+                ]
+        }],
     "animations":[
         {
             "nodes":[

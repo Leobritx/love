@@ -33,6 +33,9 @@ var GameView = /** @class */ (function (_super) {
     GameView.prototype.update = function (e) {
         GameManager.Instance.UpdateCurState();
     };
+    GameView.prototype.SetTimer = function (count) {
+        this.lblTimer.text = count.toString();
+    };
     //UIBase接口
     GameView.prototype.open = function (obj, call) {
         //初始化UI，数据加载    
@@ -43,8 +46,10 @@ var GameView = /** @class */ (function (_super) {
         }
     };
     GameView.prototype.close = function () {
+        this.removeSelf();
     };
     GameView.prototype.hide = function () {
+        this.visible = false;
     };
     GameView.prototype.show = function () {
     };

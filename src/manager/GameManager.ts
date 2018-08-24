@@ -26,6 +26,7 @@ class InitState implements StateBase {
     }
     public update() {
         this.counter++;
+        this.gameView.SetTimer(this.counter);
         if (this.counter > 2000) {
             console.log("InitState  change to InGameState!")
             GameManager.Instance.SwitchState(StateType.InGame);
