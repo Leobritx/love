@@ -32,6 +32,41 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
     }
 
 
+=======
+    private onTouchDown(e) {
+        this.curMaze.ClearPathData();
+        let curCell = this.ownerPlayer.GetCurCell();
+        this.curMaze.AddPathCell(curCell);
+        //添加鼠标移到侦听
+        Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
+
+        Laya.stage.on(Laya.Event.MOUSE_UP, this, this.onTouchUp);
+        //this.ownerPlayer.on(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
+    }
+
+    private onTouchUp(e) {
+        //添加鼠标移到侦听
+        Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
+
+        Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onTouchUp);
+        //this.ownerPlayer.off(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
+    }
+
+    private onTouchMove(e) {
+        if (Laya.timer.currFrame % 5 != 0) {
+            return;
+        }
+        let nextCell = this.curMaze.PosToMazeCell(Laya.stage.mouseX, Laya.stage.mouseY);
+        let curCell = this.curMaze.PopPathCell() || this.ownerPlayer.GetCurCell();
+        this.curMaze.AddPathCell(curCell);
+        if (this.curMaze.CheckValidStep(curCell, nextCell)) {
+            if (!nextCell.Equal(curCell)) {
+                this.curMaze.AddPathCell(nextCell);
+                this.curMaze.DrawPathByCell(nextCell);
+            }
+        }
+    }
+>>>>>>> 600d671f26c2b2ba9303079e99821205866e5c13
 
     //UIBase接口
     public open(obj: any[], call: Laya.Handler) {
