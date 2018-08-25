@@ -53435,6 +53435,8 @@ var ResourceManager = /** @class */ (function () {
         if (obj === void 0) { obj = null; }
         if (call === void 0) { call = null; }
     };
+    ResourceManager.MzBgUrl = "gameui/brickbg.png";
+    ResourceManager.PlBgUrl = "gameui/player.png";
     return ResourceManager;
 }());
 //# sourceMappingURL=ResourceManager.js.map
@@ -53568,7 +53570,7 @@ var InitState = /** @class */ (function () {
     InitState.prototype.update = function () {
         this.counter++;
         this.gameView.SetTimer(this.counter);
-        if (this.counter > 2000) {
+        if (this.counter > 200) {
             console.log("InitState  change to InGameState!");
             GameManager.Instance.SwitchState(StateType.InGame);
         }
@@ -53586,6 +53588,16 @@ var InGameState = /** @class */ (function () {
         console.log("InGameState  enter!");
     };
     InGameState.prototype.update = function () {
+        var nextCell = this.gameView.curMaze.ShiftFirstPathCell();
+        if (nextCell != null) {
+            var curCell = this.gameView.ownerPlayer.GetCurCell();
+            if (!curCell.Equal(nextCell)) {
+                this.gameView.ownerPlayer.SetCurCell(nextCell);
+                var pos = this.gameView.curMaze.CellToPos(nextCell);
+                Laya.Tween.to(this.gameView.ownerPlayer, { x: pos.x, y: pos.y }, 200);
+                Laya.Tween.to(this.gameView.light, { x: pos.x, y: pos.y }, 200);
+            }
+        }
     };
     InGameState.prototype.exit = function () {
         console.log("InGameState  exit!");
@@ -53830,19 +53842,15 @@ var Maze = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         //初始化迷宫数据
         _this.data = new MazeData();
-        _this.pathArr = new Array();
+        _this.ClearPathData();
         //迷宫UI表现初始化
         //设置迷宫背景
-        _this.loadImage(Maze.mzBgUrl, 0, 0, w, h);
+        _this.loadImage(ResourceManager.MzBgUrl, 0, 0, w, h);
         _this.pos(x, y);
         _this.CellWidth = _this.width / MazeData.COLUMN_NUM; //需要从测试看是否向下取整
         _this.CellHeight = _this.height / MazeData.ROW_NUM;
-        //添加玩家
-        _this.ownerPlayer = new Player(_this, MazeData.COLUMN_NUM - 1, MazeData.ROW_NUM - 1);
-        _this.otherPlayer = new Player(_this, 0, 0);
-        _this.ownerPlayer.on(Laya.Event.MOUSE_DOWN, _this, _this.onTouchDown);
-        Laya.timer.loop(500, _this, _this.update);
         _this.DrawWalls();
+        _this.cacheAsBitmap = true;
         return _this;
     }
     Maze.prototype.PosPointToCell = function (pos) {
@@ -53885,7 +53893,11 @@ var Maze = /** @class */ (function (_super) {
         }
         return true;
     };
-    Maze.prototype.convertPosToMaze = function (x, y) {
+    Maze.prototype.PosToMazeCell = function (x, y) {
+        var mzPos = this.ConvertPosToMazePos(x, y);
+        return this.PosPointToCell(mzPos);
+    };
+    Maze.prototype.ConvertPosToMazePos = function (x, y) {
         var rx = x - this.x;
         rx = rx > 0 ? rx : 0;
         rx = rx - this.width > 0 ? this.width : rx;
@@ -53893,6 +53905,19 @@ var Maze = /** @class */ (function (_super) {
         ry = ry > 0 ? ry : 0;
         ry = rx - this.height > 0 ? this.height : ry;
         return new Laya.Point(rx, ry);
+    };
+    // Path操作
+    Maze.prototype.ClearPathData = function () {
+        this.pathArr = new Array();
+    };
+    Maze.prototype.ShiftFirstPathCell = function () {
+        return this.pathArr.shift();
+    };
+    Maze.prototype.AddPathCell = function (cell) {
+        this.pathArr.push(cell);
+    };
+    Maze.prototype.PopPathCell = function () {
+        return this.pathArr.pop();
     };
     ///Drawing
     //画墙
@@ -53958,7 +53983,7 @@ var Maze = /** @class */ (function (_super) {
             this.graphics.drawCircle((c + 1) * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
         }
     };
-    Maze.prototype.drawPathByCell = function (cell) {
+    Maze.prototype.DrawPathByCell = function (cell) {
         this.drawPathByCellParam(cell.col, cell.row);
     };
     Maze.prototype.drawPathByCellParam = function (col, row) {
@@ -53966,50 +53991,6 @@ var Maze = /** @class */ (function (_super) {
         var cH = this.CellHeight;
         this.graphics.drawRect(col * cW + 10, row * cH + 10, cW - 20, cH - 20, "#ffffff");
     };
-    ///Event Handlers
-    Maze.prototype.update = function (e) {
-        var nextCell = this.pathArr.shift();
-        if (nextCell != null) {
-            var curCell = this.ownerPlayer.GetCurCell();
-            if (!curCell.Equal(nextCell)) {
-                this.ownerPlayer.SetCurCell(nextCell);
-                var pos = this.CellToPos(nextCell);
-                Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 200);
-            }
-        }
-    };
-    Maze.prototype.onTouchDown = function (e) {
-        this.pathArr = new Array();
-        var curCell = this.ownerPlayer.GetCurCell();
-        this.pathArr.push(curCell);
-        //添加鼠标移到侦听
-        Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
-        Laya.stage.on(Laya.Event.MOUSE_UP, this, this.onTouchUp);
-        //this.ownerPlayer.on(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
-    };
-    Maze.prototype.onTouchUp = function (e) {
-        //添加鼠标移到侦听
-        Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
-        Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onTouchUp);
-        //this.ownerPlayer.off(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
-    };
-    Maze.prototype.onTouchMove = function (e) {
-        if (Laya.timer.currFrame % 5 != 0) {
-            return;
-        }
-        //console.log("onTouchMove",Laya.stage.mouseX,Laya.stage.mouseY);
-        var mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
-        var nextCell = this.PosPointToCell(mzPos);
-        var curCell = this.pathArr.pop() || this.ownerPlayer.GetCurCell();
-        this.pathArr.push(curCell);
-        if (this.CheckValidStep(curCell, nextCell)) {
-            if (!nextCell.Equal(curCell)) {
-                this.pathArr.push(nextCell);
-                this.drawPathByCell(nextCell);
-            }
-        }
-    };
-    Maze.mzBgUrl = "gameui/brickbg.png";
     Maze.mzWallColor = "#734d26";
     Maze.mzWallWidth = 8;
     return Maze;
@@ -54034,7 +54015,7 @@ var Player = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this.maze = maze;
         _this.data = new PlayerData(cell && cell.col || c, cell && cell.row || r);
-        _this.loadImage(Player.plBgUrl);
+        _this.loadImage(ResourceManager.PlBgUrl);
         _this.maze.addChild(_this);
         _this.pivot(_this.width * 0.5, _this.height * 0.5).scale(0.5, 0.5);
         _this.RefreshMazePos();
@@ -54054,7 +54035,6 @@ var Player = /** @class */ (function (_super) {
     Player.prototype.GetCurCell = function () {
         return this.data.mazePos;
     };
-    Player.plBgUrl = "gameui/player.png";
     return Player;
 }(Laya.Sprite));
 //# sourceMappingURL=Player.js.map
@@ -54104,10 +54084,28 @@ var ui;
                 _super.prototype.createChildren.call(this);
                 this.createView(ui.UI.MainPageUI.uiView);
             };
-            MainPageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 }, "child": [{ "type": "Button", "props": { "y": 550, "x": 150, "width": 300, "var": "btnStart", "skin": "gameui/button.png", "labelSize": 40, "labelFont": "Microsoft YaHei", "label": "Start", "height": 100, "sizeGrid": "5,10,10,5" } }, { "type": "Image", "props": { "y": 300, "x": 225, "width": 150, "var": "imgAvatar", "height": 150 } }] };
+            MainPageUI.uiView = { "type": "View", "props": { "width": 600, "height": 1000 }, "child": [{ "type": "Button", "props": { "y": 550, "x": 150, "width": 300, "var": "btnStart", "skin": "gameui/button.png", "labelSize": 40, "labelFont": "Microsoft YaHei", "label": "Start", "height": 100, "sizeGrid": "5,10,10,5" } }, { "type": "Image", "props": { "y": 300, "x": 225, "width": 150, "var": "imgAvatar", "height": 150 } }, { "type": "Image", "props": { "y": 920, "x": 520, "width": 80, "var": "btnSetting", "skin": "gameui/setting.png", "height": 80 } }] };
             return MainPageUI;
         }(View));
         UI.MainPageUI = MainPageUI;
+    })(UI = ui.UI || (ui.UI = {}));
+})(ui || (ui = {}));
+(function (ui) {
+    var UI;
+    (function (UI) {
+        var SettingDialogUI = /** @class */ (function (_super) {
+            __extends(SettingDialogUI, _super);
+            function SettingDialogUI() {
+                return _super.call(this) || this;
+            }
+            SettingDialogUI.prototype.createChildren = function () {
+                _super.prototype.createChildren.call(this);
+                this.createView(ui.UI.SettingDialogUI.uiView);
+            };
+            SettingDialogUI.uiView = { "type": "Dialog", "props": { "width": 400, "height": 360, "centerY": 0, "centerX": 0 }, "child": [{ "type": "Image", "props": { "y": 0, "x": 0, "width": 400, "skin": "gameui/brickbg.png", "height": 360, "sizeGrid": "2,2,2,2" } }, { "type": "Button", "props": { "width": 119, "var": "btnConfirm", "skin": "gameui/button.png", "label": "Confirm", "height": 37, "centerY": 120, "centerX": 0, "sizeGrid": "5,10,10,5" } }, { "type": "Button", "props": { "y": 1, "x": 368, "width": 30, "var": "btnClose", "skin": "gameui/button.png", "label": "X", "height": 28, "sizeGrid": "5,10,10,5" } }] };
+            return SettingDialogUI;
+        }(Dialog));
+        UI.SettingDialogUI = SettingDialogUI;
     })(UI = ui.UI || (ui.UI = {}));
 })(ui || (ui = {}));
 //# sourceMappingURL=layaUI.max.all.js.map
@@ -54136,8 +54134,22 @@ var GameView = /** @class */ (function (_super) {
     }
     GameView.prototype.init = function () {
         Laya.stage.bgColor = "#f8d3e5";
-        //添加迷宫
+        //实例化迷宫
         this.curMaze = new Maze(0, 200, 600, 600);
+        //创建迷雾
+        this.fog = new Laya.Sprite();
+        this.fog.loadImage(GameView.mzFogUrl, 0, 200, this.curMaze.width, this.curMaze.height);
+        this.fog.pos(0, 0);
+        //添加玩家
+        this.ownerPlayer = new Player(this.curMaze, MazeData.COLUMN_NUM - 1, MazeData.ROW_NUM - 1);
+        this.otherPlayer = new Player(this.curMaze, 0, 0);
+        this.ownerPlayer.on(Laya.Event.MOUSE_DOWN, this, this.onTouchDown);
+        this.light = new Laya.Sprite();
+        this.light.loadImage(GameView.mzLightUrl);
+        this.light.scale(3, 3);
+        this.light.pos(this.ownerPlayer.x - 200, this.ownerPlayer.y - 200);
+        this.curMaze.mask = this.light;
+        this.addChild(this.fog);
         this.addChild(this.curMaze);
         new GameManager(this);
         GameManager.Instance.SwitchState(StateType.Init);
@@ -54148,6 +54160,35 @@ var GameView = /** @class */ (function (_super) {
     };
     GameView.prototype.SetTimer = function (count) {
         this.lblTimer.text = count.toString();
+    };
+    GameView.prototype.onTouchDown = function (e) {
+        this.curMaze.ClearPathData();
+        var curCell = this.ownerPlayer.GetCurCell();
+        this.curMaze.AddPathCell(curCell);
+        //添加鼠标移到侦听
+        Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
+        Laya.stage.on(Laya.Event.MOUSE_UP, this, this.onTouchUp);
+        //this.ownerPlayer.on(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
+    };
+    GameView.prototype.onTouchUp = function (e) {
+        //添加鼠标移到侦听
+        Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
+        Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onTouchUp);
+        //this.ownerPlayer.off(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
+    };
+    GameView.prototype.onTouchMove = function (e) {
+        if (Laya.timer.currFrame % 5 != 0) {
+            return;
+        }
+        var nextCell = this.curMaze.PosToMazeCell(Laya.stage.mouseX, Laya.stage.mouseY);
+        var curCell = this.curMaze.PopPathCell() || this.ownerPlayer.GetCurCell();
+        this.curMaze.AddPathCell(curCell);
+        if (this.curMaze.CheckValidStep(curCell, nextCell)) {
+            if (!nextCell.Equal(curCell)) {
+                this.curMaze.AddPathCell(nextCell);
+                this.curMaze.DrawPathByCell(nextCell);
+            }
+        }
     };
     //UIBase接口
     GameView.prototype.open = function (obj, call) {
@@ -54166,6 +54207,8 @@ var GameView = /** @class */ (function (_super) {
     };
     GameView.prototype.show = function () {
     };
+    GameView.mzFogUrl = "gameui/fog.png";
+    GameView.mzLightUrl = "gameui/light.png";
     return GameView;
 }(ui.UI.GamePageUI));
 //# sourceMappingURL=GameView.js.map
@@ -54198,9 +54241,13 @@ var MainView = /** @class */ (function (_super) {
         Laya.stage.bgColor = "#94deec";
         this.btnStart.on(Event.CLICK, this, this.onStartClick);
         this.imgAvatar.loadImage("gameui/brick.png");
+        this.btnSetting.on(Event.CLICK, this, this.onSettingClick);
     };
     MainView.prototype.onStartClick = function (e) {
         UIManager.Instance.SwitchUI(UIType.GameView);
+    };
+    MainView.prototype.onSettingClick = function (e) {
+        this.addChild(new SettingDialog());
     };
     //UIBase接口
     MainView.prototype.open = function (obj, call) {
@@ -54223,6 +54270,32 @@ var MainView = /** @class */ (function (_super) {
     return MainView;
 }(ui.UI.MainPageUI));
 //# sourceMappingURL=MainView.js.map
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var SettingDialog = /** @class */ (function (_super) {
+    __extends(SettingDialog, _super);
+    function SettingDialog() {
+        var _this = _super.call(this) || this;
+        _this.btnClose.on(Laya.Event.CLICK, _this, _this.onClose);
+        return _this;
+    }
+    SettingDialog.prototype.onClose = function (e) {
+        this.removeSelf();
+    };
+    return SettingDialog;
+}(ui.UI.SettingDialogUI));
+//# sourceMappingURL=SettingDialog.js.map
 // 程序入口
 var GameApp = /** @class */ (function () {
     function GameApp() {

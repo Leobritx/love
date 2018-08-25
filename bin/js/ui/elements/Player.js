@@ -17,7 +17,7 @@ var Player = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this.maze = maze;
         _this.data = new PlayerData(cell && cell.col || c, cell && cell.row || r);
-        _this.loadImage(Player.plBgUrl);
+        _this.loadImage(ResourceManager.PlBgUrl);
         _this.maze.addChild(_this);
         _this.pivot(_this.width * 0.5, _this.height * 0.5).scale(0.5, 0.5);
         _this.RefreshMazePos();
@@ -37,7 +37,6 @@ var Player = /** @class */ (function (_super) {
     Player.prototype.GetCurCell = function () {
         return this.data.mazePos;
     };
-    Player.plBgUrl = "gameui/player.png";
     return Player;
 }(Laya.Sprite));
 //# sourceMappingURL=Player.js.map

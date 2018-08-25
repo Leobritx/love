@@ -17,19 +17,15 @@ var Maze = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         //初始化迷宫数据
         _this.data = new MazeData();
-        _this.pathArr = new Array();
+        _this.ClearPathData();
         //迷宫UI表现初始化
         //设置迷宫背景
-        _this.loadImage(Maze.mzBgUrl, 0, 0, w, h);
+        _this.loadImage(ResourceManager.MzBgUrl, 0, 0, w, h);
         _this.pos(x, y);
         _this.CellWidth = _this.width / MazeData.COLUMN_NUM; //需要从测试看是否向下取整
         _this.CellHeight = _this.height / MazeData.ROW_NUM;
-        //添加玩家
-        _this.ownerPlayer = new Player(_this, MazeData.COLUMN_NUM - 1, MazeData.ROW_NUM - 1);
-        _this.otherPlayer = new Player(_this, 0, 0);
-        _this.ownerPlayer.on(Laya.Event.MOUSE_DOWN, _this, _this.onTouchDown);
-        Laya.timer.loop(500, _this, _this.update);
         _this.DrawWalls();
+        _this.cacheAsBitmap = true;
         return _this;
     }
     Maze.prototype.PosPointToCell = function (pos) {
@@ -72,7 +68,11 @@ var Maze = /** @class */ (function (_super) {
         }
         return true;
     };
-    Maze.prototype.convertPosToMaze = function (x, y) {
+    Maze.prototype.PosToMazeCell = function (x, y) {
+        var mzPos = this.ConvertPosToMazePos(x, y);
+        return this.PosPointToCell(mzPos);
+    };
+    Maze.prototype.ConvertPosToMazePos = function (x, y) {
         var rx = x - this.x;
         rx = rx > 0 ? rx : 0;
         rx = rx - this.width > 0 ? this.width : rx;
@@ -80,6 +80,19 @@ var Maze = /** @class */ (function (_super) {
         ry = ry > 0 ? ry : 0;
         ry = rx - this.height > 0 ? this.height : ry;
         return new Laya.Point(rx, ry);
+    };
+    // Path操作
+    Maze.prototype.ClearPathData = function () {
+        this.pathArr = new Array();
+    };
+    Maze.prototype.ShiftFirstPathCell = function () {
+        return this.pathArr.shift();
+    };
+    Maze.prototype.AddPathCell = function (cell) {
+        this.pathArr.push(cell);
+    };
+    Maze.prototype.PopPathCell = function () {
+        return this.pathArr.pop();
     };
     ///Drawing
     //画墙
@@ -145,7 +158,7 @@ var Maze = /** @class */ (function (_super) {
             this.graphics.drawCircle((c + 1) * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
         }
     };
-    Maze.prototype.drawPathByCell = function (cell) {
+    Maze.prototype.DrawPathByCell = function (cell) {
         this.drawPathByCellParam(cell.col, cell.row);
     };
     Maze.prototype.drawPathByCellParam = function (col, row) {
@@ -153,50 +166,6 @@ var Maze = /** @class */ (function (_super) {
         var cH = this.CellHeight;
         this.graphics.drawRect(col * cW + 10, row * cH + 10, cW - 20, cH - 20, "#ffffff");
     };
-    ///Event Handlers
-    Maze.prototype.update = function (e) {
-        var nextCell = this.pathArr.shift();
-        if (nextCell != null) {
-            var curCell = this.ownerPlayer.GetCurCell();
-            if (!curCell.Equal(nextCell)) {
-                this.ownerPlayer.SetCurCell(nextCell);
-                var pos = this.CellToPos(nextCell);
-                Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 200);
-            }
-        }
-    };
-    Maze.prototype.onTouchDown = function (e) {
-        this.pathArr = new Array();
-        var curCell = this.ownerPlayer.GetCurCell();
-        this.pathArr.push(curCell);
-        //添加鼠标移到侦听
-        Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
-        Laya.stage.on(Laya.Event.MOUSE_UP, this, this.onTouchUp);
-        //this.ownerPlayer.on(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
-    };
-    Maze.prototype.onTouchUp = function (e) {
-        //添加鼠标移到侦听
-        Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
-        Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onTouchUp);
-        //this.ownerPlayer.off(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
-    };
-    Maze.prototype.onTouchMove = function (e) {
-        if (Laya.timer.currFrame % 5 != 0) {
-            return;
-        }
-        //console.log("onTouchMove",Laya.stage.mouseX,Laya.stage.mouseY);
-        var mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
-        var nextCell = this.PosPointToCell(mzPos);
-        var curCell = this.pathArr.pop() || this.ownerPlayer.GetCurCell();
-        this.pathArr.push(curCell);
-        if (this.CheckValidStep(curCell, nextCell)) {
-            if (!nextCell.Equal(curCell)) {
-                this.pathArr.push(nextCell);
-                this.drawPathByCell(nextCell);
-            }
-        }
-    };
-    Maze.mzBgUrl = "gameui/brickbg.png";
     Maze.mzWallColor = "#734d26";
     Maze.mzWallWidth = 8;
     return Maze;

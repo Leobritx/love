@@ -39,9 +39,9 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
         this.light.loadImage(GameView.mzLightUrl);
         this.light.scale(3,3);
         this.light.pos(this.ownerPlayer.x-200,this.ownerPlayer.y-200);
-        //this.curMaze.mask = this.light;
+        this.curMaze.mask = this.light;
         
-        //this.addChild(this.fog);
+        this.addChild(this.fog);
         this.addChild(this.curMaze);
 
         new GameManager(this);
@@ -54,13 +54,10 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
         GameManager.Instance.UpdateCurState();
     }
 
-<<<<<<< HEAD
     public SetTimer(count:number){
         this.lblTimer.text = count.toString();
     }
 
-
-=======
     private onTouchDown(e) {
         this.curMaze.ClearPathData();
         let curCell = this.ownerPlayer.GetCurCell();
@@ -94,7 +91,6 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
             }
         }
     }
->>>>>>> 600d671f26c2b2ba9303079e99821205866e5c13
 
     //UIBase接口
     public open(obj: any[], call: Laya.Handler) {

@@ -40,7 +40,7 @@ module ui.UI {
 		public btnConfirm:Laya.Button;
 		public btnClose:Laya.Button;
 
-        public static  uiView:any ={"type":"Dialog","props":{"width":400,"height":360,"centerY":0,"centerX":0},"child":[{"type":"Image","props":{"y":0,"x":0,"width":400,"skin":"gameui/brickbg.png","height":360,"sizeGrid":"2,2,2,2"}},{"type":"Button","props":{"width":119,"var":"btnConfirm","skin":"gameui/button.png","label":"Confirm","height":37,"centerY":120,"centerX":0,"sizeGrid":"5,10,10,5"}},{"type":"Button","props":{"y":1,"x":368,"width":30,"var":"btnClose","skin":"gameui/button.png","label":"X","height":28,"sizeGrid":"5,10,10,5"}},{"type":"HSlider","props":{"width":312,"value":50,"skin":"template/ScrollBar/BackProgressBar.png","sizeGrid":"0,15,0,15","height":45,"centerY":30,"centerX":0}}]};
+        public static  uiView:any ={"type":"Dialog","props":{"width":400,"height":360,"centerY":0,"centerX":0},"child":[{"type":"Image","props":{"y":0,"x":0,"width":400,"skin":"gameui/brickbg.png","height":360,"sizeGrid":"2,2,2,2"}},{"type":"Button","props":{"width":119,"var":"btnConfirm","skin":"gameui/button.png","label":"Confirm","height":37,"centerY":120,"centerX":0,"sizeGrid":"5,10,10,5"}},{"type":"Button","props":{"y":1,"x":368,"width":30,"var":"btnClose","skin":"gameui/button.png","label":"X","height":28,"sizeGrid":"5,10,10,5"}}]};
         constructor(){ super()}
         createChildren():void {
         

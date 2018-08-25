@@ -3,11 +3,7 @@
     "type":"View",
     "selectedBox":1,
     "selecteID":1,
-<<<<<<< HEAD
-    "props":{"width":600,"sceneColor":"#eab0ce","height":1000},
-=======
     "props":{"width":600,"sceneColor":"#f8d3e5","height":1000},
->>>>>>> 600d671f26c2b2ba9303079e99821205866e5c13
     "nodeParent":-1,
     "label":"View",
     "isOpen":true,
