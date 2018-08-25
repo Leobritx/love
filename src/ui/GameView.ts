@@ -3,7 +3,15 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
     //定义UI类型
     type: UIType = UIType.GameView;
 
-    private curMaze: Maze;
+    private static mzFogUrl = "gameui/fog.png";
+    private static mzLightUrl = "gameui/light.png";
+
+    public curMaze: Maze;
+    public ownerPlayer: Player;
+    public otherPlayer: Player;
+
+    public fog:Laya.Sprite;
+    public light:Laya.Sprite;
 
     constructor() {
         super();
@@ -13,8 +21,27 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
     private init(): void {
         Laya.stage.bgColor = "#f8d3e5";
 
-        //添加迷宫
+        //实例化迷宫
         this.curMaze = new Maze(0, 200, 600, 600);
+
+        //创建迷雾
+        this.fog = new Laya.Sprite();
+        this.fog.loadImage(GameView.mzFogUrl, 0, 200, this.curMaze.width, this.curMaze.height);
+        this.fog.pos(0, 0);
+
+        //添加玩家
+        this.ownerPlayer = new Player(this.curMaze, MazeData.COLUMN_NUM - 1, MazeData.ROW_NUM - 1);
+        this.otherPlayer = new Player(this.curMaze, 0, 0);
+
+        this.ownerPlayer.on(Laya.Event.MOUSE_DOWN, this, this.onTouchDown);
+
+        this.light = new Laya.Sprite();
+        this.light.loadImage(GameView.mzLightUrl);
+        this.light.scale(3,3);
+        this.light.pos(this.ownerPlayer.x-200,this.ownerPlayer.y-200);
+        //this.curMaze.mask = this.light;
+        
+        //this.addChild(this.fog);
         this.addChild(this.curMaze);
 
         new GameManager(this);
@@ -27,6 +54,7 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
         GameManager.Instance.UpdateCurState();
     }
 
+<<<<<<< HEAD
     public SetTimer(count:number){
         this.lblTimer.text = count.toString();
     }

@@ -14,6 +14,9 @@ enum ResType {
 class ResourceManager {
     public static Instance: ResourceManager;
 
+    public static MzBgUrl = "gameui/brickbg.png";
+    public static PlBgUrl = "gameui/player.png";
+
     //private DATA_PATH: string = "res/data/l1.json";
     private UI_TEXTURE_PATH: string = "res/atlas/gameui.atlas";
     private UI_IMG_PATH: string = "res/atlas/gameui.png";
