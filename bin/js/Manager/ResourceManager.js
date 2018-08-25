@@ -24,6 +24,8 @@ var ResourceManager = /** @class */ (function () {
         if (obj === void 0) { obj = null; }
         if (call === void 0) { call = null; }
     };
+    ResourceManager.MzBgUrl = "gameui/brickbg.png";
+    ResourceManager.PlBgUrl = "gameui/player.png";
     return ResourceManager;
 }());
 //# sourceMappingURL=ResourceManager.js.map

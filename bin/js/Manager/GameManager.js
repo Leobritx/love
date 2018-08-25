@@ -15,7 +15,7 @@ var InitState = /** @class */ (function () {
     };
     InitState.prototype.update = function () {
         this.counter++;
-        if (this.counter > 2000) {
+        if (this.counter > 600) {
             console.log("InitState  change to InGameState!");
             GameManager.Instance.SwitchState(StateType.InGame);
         }
@@ -33,6 +33,16 @@ var InGameState = /** @class */ (function () {
         console.log("InGameState  enter!");
     };
     InGameState.prototype.update = function () {
+        var nextCell = this.gameView.curMaze.ShiftFirstPathCell();
+        if (nextCell != null) {
+            var curCell = this.gameView.ownerPlayer.GetCurCell();
+            if (!curCell.Equal(nextCell)) {
+                this.gameView.ownerPlayer.SetCurCell(nextCell);
+                var pos = this.gameView.curMaze.CellToPos(nextCell);
+                Laya.Tween.to(this.gameView.ownerPlayer, { x: pos.x, y: pos.y }, 200);
+                Laya.Tween.to(this.gameView.light, { x: pos.x, y: pos.y }, 200);
+            }
+        }
     };
     InGameState.prototype.exit = function () {
         console.log("InGameState  exit!");

@@ -1,6 +1,5 @@
 class Player extends Laya.Sprite {
     private data: PlayerData;//玩家数据
-    private static plBgUrl = "gameui/player.png";
 
     private maze: Maze;//所在迷宫
 
@@ -9,7 +8,7 @@ class Player extends Laya.Sprite {
         this.maze = maze;
         this.data = new PlayerData(cell && cell.col || c, cell && cell.row || r);
 
-        this.loadImage(Player.plBgUrl);
+        this.loadImage(ResourceManager.PlBgUrl);
         this.maze.addChild(this);
 
         this.pivot(this.width * 0.5, this.height * 0.5).scale(0.5, 0.5);

@@ -1,5 +1,4 @@
 class Maze extends Laya.Sprite {
-    private static mzBgUrl = "gameui/brickbg.png";
     private static mzWallColor = "#734d26";
     private static mzWallWidth = 8;
 
@@ -8,8 +7,6 @@ class Maze extends Laya.Sprite {
     private CellWidth: number;
     private CellHeight: number;
 
-    private ownerPlayer: Player;
-    private otherPlayer: Player;
 
     private pathArr: Array<MazeCell>;
 
@@ -17,24 +14,17 @@ class Maze extends Laya.Sprite {
         super();
         //初始化迷宫数据
         this.data = new MazeData();
-        this.pathArr = new Array<MazeCell>();
+        this.ClearPathData();
         //迷宫UI表现初始化
         //设置迷宫背景
-        this.loadImage(Maze.mzBgUrl, 0, 0, w, h);
+        this.loadImage(ResourceManager.MzBgUrl, 0, 0, w, h);
         this.pos(x, y);
 
         this.CellWidth = this.width / MazeData.COLUMN_NUM;//需要从测试看是否向下取整
         this.CellHeight = this.height / MazeData.ROW_NUM;
 
-        //添加玩家
-        this.ownerPlayer = new Player(this, MazeData.COLUMN_NUM - 1, MazeData.ROW_NUM - 1);
-        this.otherPlayer = new Player(this, 0, 0);
-
-        this.ownerPlayer.on(Laya.Event.MOUSE_DOWN, this, this.onTouchDown);
-
-        Laya.timer.loop(500, this, this.update);
-
         this.DrawWalls();
+        this.cacheAsBitmap = true;
     }
 
     public PosPointToCell(pos: Laya.Point) {
@@ -82,7 +72,12 @@ class Maze extends Laya.Sprite {
         return true;
     }
 
-    private convertPosToMaze(x, y) {
+    public PosToMazeCell(x,y){
+        let mzPos = this.ConvertPosToMazePos(x, y);
+        return this.PosPointToCell(mzPos);
+    }
+
+    public ConvertPosToMazePos(x, y) {
         let rx = x - this.x;
         rx = rx > 0 ? rx : 0;
         rx = rx - this.width > 0 ? this.width : rx;
@@ -90,6 +85,23 @@ class Maze extends Laya.Sprite {
         ry = ry > 0 ? ry : 0;
         ry = rx - this.height > 0 ? this.height : ry;
         return new Laya.Point(rx, ry);
+    }
+
+    // Path操作
+    public ClearPathData(){
+        this.pathArr = new Array<MazeCell>();
+    }
+
+    public ShiftFirstPathCell(){
+        return this.pathArr.shift();
+    }
+
+    public AddPathCell(cell:MazeCell){
+        this.pathArr.push(cell);
+    }
+
+    public PopPathCell(){
+        return this.pathArr.pop();
     }
 
     ///Drawing
@@ -157,7 +169,7 @@ class Maze extends Laya.Sprite {
         }
     }
 
-    private drawPathByCell(cell: MazeCell) {
+    public DrawPathByCell(cell: MazeCell) {
         this.drawPathByCellParam(cell.col, cell.row);
     }
 
@@ -165,54 +177,5 @@ class Maze extends Laya.Sprite {
         let cW = this.CellWidth;
         let cH = this.CellHeight;
         this.graphics.drawRect(col * cW + 10, row * cH + 10, cW - 20, cH - 20, "#ffffff");
-    }
-
-    ///Event Handlers
-    private update(e) {
-        let nextCell = this.pathArr.shift();
-        if (nextCell != null) {
-            let curCell = this.ownerPlayer.GetCurCell();
-            if (!curCell.Equal(nextCell)) {
-                this.ownerPlayer.SetCurCell(nextCell);
-                let pos = this.CellToPos(nextCell);
-                Laya.Tween.to(this.ownerPlayer, { x: pos.x, y: pos.y }, 200);
-            }
-        }
-    }
-
-    private onTouchDown(e) {
-        this.pathArr = new Array<MazeCell>();
-        let curCell = this.ownerPlayer.GetCurCell();
-        this.pathArr.push(curCell);
-        //添加鼠标移到侦听
-        Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
-
-        Laya.stage.on(Laya.Event.MOUSE_UP, this, this.onTouchUp);
-        //this.ownerPlayer.on(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
-    }
-
-    private onTouchUp(e) {
-        //添加鼠标移到侦听
-        Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onTouchMove);
-
-        Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onTouchUp);
-        //this.ownerPlayer.off(Laya.Event.MOUSE_OUT, this, this.onTouchUp);
-    }
-
-    private onTouchMove(e) {
-        if (Laya.timer.currFrame % 5 != 0) {
-            return;
-        }
-        //console.log("onTouchMove",Laya.stage.mouseX,Laya.stage.mouseY);
-        let mzPos = this.convertPosToMaze(Laya.stage.mouseX, Laya.stage.mouseY);
-        let nextCell = this.PosPointToCell(mzPos);
-        let curCell = this.pathArr.pop() || this.ownerPlayer.GetCurCell();
-        this.pathArr.push(curCell);
-        if (this.CheckValidStep(curCell, nextCell)) {
-            if (!nextCell.Equal(curCell)) {
-                this.pathArr.push(nextCell);
-                this.drawPathByCell(nextCell);
-            }
-        }
     }
 }

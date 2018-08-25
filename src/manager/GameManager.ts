@@ -26,7 +26,7 @@ class InitState implements StateBase {
     }
     public update() {
         this.counter++;
-        if (this.counter > 2000) {
+        if (this.counter > 600) {
             console.log("InitState  change to InGameState!")
             GameManager.Instance.SwitchState(StateType.InGame);
         }
@@ -45,6 +45,16 @@ class InGameState implements StateBase {
         console.log("InGameState  enter!")
     }
     public update() {
+        let nextCell = this.gameView.curMaze.ShiftFirstPathCell();
+        if (nextCell != null) {
+            let curCell = this.gameView.ownerPlayer.GetCurCell();
+            if (!curCell.Equal(nextCell)) {
+                this.gameView.ownerPlayer.SetCurCell(nextCell);
+                let pos = this.gameView.curMaze.CellToPos(nextCell);
+                Laya.Tween.to(this.gameView.ownerPlayer, { x: pos.x, y: pos.y }, 200);
+                Laya.Tween.to(this.gameView.light, { x: pos.x, y: pos.y }, 200);
+            }
+        }
 
     }
     public exit() {
