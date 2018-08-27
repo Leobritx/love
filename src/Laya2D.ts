@@ -20,6 +20,7 @@ class GameApp {
 		Laya.stage.scaleMode = "showall";
 		Laya.stage.alignH = "center";
 		Laya.stage.frameRate = Laya.Stage.FRAME_MOUSE;
+		Laya.DebugTool.init();
 
 		SettingManager.Instance.Get();
 		ResourceManager.Instance.Load(Laya.Handler.create(this, this.onloaded));

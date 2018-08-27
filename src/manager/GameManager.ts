@@ -26,9 +26,10 @@ class InitState implements StateBase {
     }
     public update() {
         this.counter++;
-        this.gameView.SetTimer(this.counter);
+        this.gameView.SetTitle(this.counter.toString());
         if (this.counter > 200) {
             console.log("InitState  change to InGameState!")
+            this.gameView.SetTitle("In Game!");
             GameManager.Instance.SwitchState(StateType.InGame);
         }
 
@@ -47,22 +48,40 @@ class InGameState implements StateBase {
     }
     public update() {
         let nextCell = this.gameView.curMaze.ShiftFirstPathCell();
+        let curCell = this.gameView.ownerPlayer.GetCurCell();
         if (nextCell != null) {
-            let curCell = this.gameView.ownerPlayer.GetCurCell();
             if (!curCell.Equal(nextCell)) {
                 this.gameView.ownerPlayer.SetCurCell(nextCell);
-                let pos = this.gameView.curMaze.CellToPos(nextCell);
+                let mzPos = this.gameView.curMaze.CellToMazePos(nextCell);
+                let pos = this.gameView.curMaze.MazePosToPos(mzPos.x,mzPos.y);
                 Laya.Tween.to(this.gameView.ownerPlayer, { x: pos.x, y: pos.y }, 200);
-                Laya.Tween.to(this.gameView.light, { x: pos.x, y: pos.y }, 200);
+                Laya.Tween.to(this.gameView.light, { x: mzPos.x, y: mzPos.y }, 200);
             }
         }
-
+        if (curCell.col == 0 && curCell.row == 0) {
+            GameManager.Instance.SwitchState(StateType.End);
+        }
     }
     public exit() {
         console.log("InGameState  exit!")
     }
 }
 
+class EndGameState implements StateBase {
+    gameView: GameView;
+    constructor(gv: GameView) {
+        this.gameView = gv;
+    }
+    public enter() {
+        this.gameView.SetTitle("Success!");
+        console.log("EndGameState  enter!")
+    }
+    public update() {
+    }
+    public exit() {
+        console.log("EndGameState  exit!")
+    }
+}
 
 class GameManager {
     public static Instance: GameManager;
@@ -76,6 +95,7 @@ class GameManager {
 
         this.stateMap[StateType.Init] = new InitState(gv);
         this.stateMap[StateType.InGame] = new InGameState(gv);
+        this.stateMap[StateType.End] = new EndGameState(gv);
     }
 
     public CurState() {

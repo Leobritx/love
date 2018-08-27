@@ -13,7 +13,7 @@ class MainView extends ui.UI.MainPageUI implements UIBase {
         Laya.stage.bgColor = "#94deec";
         this.btnStart.on(Event.CLICK, this, this.onStartClick);
         this.imgAvatar.loadImage("gameui/brick.png");
-        this.btnSetting.on(Event.CLICK,this,this.onSettingClick);
+        this.btnSetting.on(Event.CLICK, this, this.onSettingClick);
     }
 
 

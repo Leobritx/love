@@ -1,7 +1,7 @@
 class PlayerData {
-    public mazePos: MazeCell;
+    public playerCell: MazeCell;
 
     constructor(c?: number, r?: number) {
-        this.mazePos = new MazeCell(c, r);
+        this.playerCell = new MazeCell(c, r);
     }
 }

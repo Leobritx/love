@@ -62,7 +62,7 @@ var ui;
                 _super.prototype.createChildren.call(this);
                 this.createView(ui.UI.SettingDialogUI.uiView);
             };
-            SettingDialogUI.uiView = { "type": "Dialog", "props": { "width": 400, "height": 360, "centerY": 0, "centerX": 0 }, "child": [{ "type": "Image", "props": { "y": 0, "x": 0, "width": 400, "skin": "gameui/brickbg.png", "height": 360, "sizeGrid": "2,2,2,2" } }, { "type": "Button", "props": { "width": 119, "var": "btnConfirm", "skin": "gameui/button.png", "label": "Confirm", "height": 37, "centerY": 120, "centerX": 0, "sizeGrid": "5,10,10,5" } }, { "type": "Button", "props": { "y": 1, "x": 368, "width": 30, "var": "btnClose", "skin": "gameui/button.png", "label": "X", "height": 28, "sizeGrid": "5,10,10,5" } }] };
+            SettingDialogUI.uiView = { "type": "Dialog", "props": { "width": 400, "height": 360, "centerY": 0, "centerX": 0 }, "child": [{ "type": "Image", "props": { "y": 0, "x": 0, "width": 400, "skin": "gameui/brickbg.png", "height": 360, "sizeGrid": "2,2,2,2" } }, { "type": "Button", "props": { "width": 119, "var": "btnConfirm", "skin": "gameui/button.png", "label": "Confirm", "height": 37, "centerY": 120, "centerX": 0, "sizeGrid": "5,10,10,5" } }, { "type": "Button", "props": { "y": 1, "x": 353, "width": 45, "var": "btnClose", "skin": "gameui/button.png", "label": "X", "height": 40, "sizeGrid": "5,10,10,5" } }] };
             return SettingDialogUI;
         }(Dialog));
         UI.SettingDialogUI = SettingDialogUI;

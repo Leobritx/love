@@ -10,8 +10,8 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
     public ownerPlayer: Player;
     public otherPlayer: Player;
 
-    public fog:Laya.Sprite;
-    public light:Laya.Sprite;
+    public fog: Laya.Sprite;
+    public light: Laya.Sprite;
 
     constructor() {
         super();
@@ -26,23 +26,24 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
 
         //创建迷雾
         this.fog = new Laya.Sprite();
-        this.fog.loadImage(GameView.mzFogUrl, 0, 200, this.curMaze.width, this.curMaze.height);
-        this.fog.pos(0, 0);
+        this.fog.loadImage(GameView.mzFogUrl, 0, 180, this.curMaze.width, this.curMaze.height + 40);
 
         //添加玩家
         this.ownerPlayer = new Player(this.curMaze, MazeData.COLUMN_NUM - 1, MazeData.ROW_NUM - 1);
-        this.otherPlayer = new Player(this.curMaze, 0, 0);
+        //this.otherPlayer = new Player(this.curMaze, 0, 0);
 
         this.ownerPlayer.on(Laya.Event.MOUSE_DOWN, this, this.onTouchDown);
 
-        this.light = new Laya.Sprite();
-        this.light.loadImage(GameView.mzLightUrl);
-        this.light.scale(3,3);
-        this.light.pos(this.ownerPlayer.x-200,this.ownerPlayer.y-200);
-        this.curMaze.mask = this.light;
-        
         this.addChild(this.fog);
         this.addChild(this.curMaze);
+        this.addChild(this.ownerPlayer);
+
+        this.light = new Laya.Sprite();
+        this.light.loadImage(GameView.mzLightUrl);
+        this.light.pivot(this.light.width * 0.5, this.light.height * 0.5).scale(3, 3);
+        let mzPos = this.curMaze.PosToMazePos(this.ownerPlayer.x, this.ownerPlayer.y);
+        this.light.pos(mzPos.x, mzPos.y);
+        this.curMaze.mask = this.light;
 
         new GameManager(this);
         GameManager.Instance.SwitchState(StateType.Init);
@@ -50,12 +51,8 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
         Laya.timer.loop(1000 / (DisplayConfig.Instance.fps || 30), this, this.update);
     }
 
-    private update(e) {
-        GameManager.Instance.UpdateCurState();
-    }
-
-    public SetTimer(count:number){
-        this.lblTimer.text = count.toString();
+    public SetTitle(title: string) {
+        this.lblTimer.text = title;
     }
 
     private onTouchDown(e) {
@@ -87,9 +84,13 @@ class GameView extends ui.UI.GamePageUI implements UIBase {
         if (this.curMaze.CheckValidStep(curCell, nextCell)) {
             if (!nextCell.Equal(curCell)) {
                 this.curMaze.AddPathCell(nextCell);
-                this.curMaze.DrawPathByCell(nextCell);
+                //this.curMaze.DrawPathByCell(nextCell);
             }
         }
+    }
+
+    private update(e) {
+        GameManager.Instance.UpdateCurState();
     }
 
     //UIBase接口

@@ -19,30 +19,56 @@ var Maze = /** @class */ (function (_super) {
         _this.data = new MazeData();
         _this.ClearPathData();
         //迷宫UI表现初始化
+        _this.pos(x, y);
         //设置迷宫背景
         _this.loadImage(ResourceManager.MzBgUrl, 0, 0, w, h);
-        _this.pos(x, y);
+        _this.staticCanvas = new Laya.Sprite();
+        //this.staticCanvas.width = w;
+        //this.staticCanvas.height = h;
+        _this.addChild(_this.staticCanvas);
+        _this.staticCanvas.cacheAsBitmap = true;
         _this.CellWidth = _this.width / MazeData.COLUMN_NUM; //需要从测试看是否向下取整
         _this.CellHeight = _this.height / MazeData.ROW_NUM;
         _this.DrawWalls();
-        _this.cacheAsBitmap = true;
         return _this;
     }
-    Maze.prototype.PosPointToCell = function (pos) {
-        return this.PosToCell(pos.x, pos.y);
+    Maze.prototype.MazePosPointToCell = function (pos) {
+        return this.MazePosToCell(pos.x, pos.y);
     };
-    Maze.prototype.PosToCell = function (x, y) {
+    Maze.prototype.MazePosToCell = function (x, y) {
         var cell = new MazeCell(x / this.CellWidth, y / this.CellHeight);
         return cell;
     };
-    Maze.prototype.CellParamsToPos = function (col, row) {
+    Maze.prototype.CellParamsToMazePos = function (col, row) {
         var pos = new Laya.Point();
         pos.x = Math.floor((col + 0.5) * this.CellWidth);
         pos.y = Math.floor((row + 0.5) * this.CellHeight);
         return pos;
     };
-    Maze.prototype.CellToPos = function (cell) {
-        return this.CellParamsToPos(cell.col, cell.row);
+    Maze.prototype.CellToMazePos = function (cell) {
+        return this.CellParamsToMazePos(cell.col, cell.row);
+    };
+    Maze.prototype.PosToMazeCell = function (x, y) {
+        var mzPos = this.PosToMazePos(x, y);
+        return this.MazePosPointToCell(mzPos);
+    };
+    Maze.prototype.MazeCellToPos = function (cell) {
+        var mzPos = this.CellToMazePos(cell);
+        return this.MazePosToPos(mzPos.x, mzPos.y);
+    };
+    Maze.prototype.PosToMazePos = function (x, y) {
+        var rx = x - this.x;
+        rx = rx > 0 ? rx : 0;
+        rx = rx - this.width > 0 ? this.width : rx;
+        var ry = y - this.y;
+        ry = ry > 0 ? ry : 0;
+        ry = rx - this.height > 0 ? this.height : ry;
+        return new Laya.Point(rx, ry);
+    };
+    Maze.prototype.MazePosToPos = function (x, y) {
+        var rx = x + this.x;
+        var ry = y + this.y;
+        return new Laya.Point(rx, ry);
     };
     Maze.prototype.CheckValidStep = function (cur, next) {
         var dr = next.row - cur.row;
@@ -67,19 +93,6 @@ var Maze = /** @class */ (function (_super) {
             return false;
         }
         return true;
-    };
-    Maze.prototype.PosToMazeCell = function (x, y) {
-        var mzPos = this.ConvertPosToMazePos(x, y);
-        return this.PosPointToCell(mzPos);
-    };
-    Maze.prototype.ConvertPosToMazePos = function (x, y) {
-        var rx = x - this.x;
-        rx = rx > 0 ? rx : 0;
-        rx = rx - this.width > 0 ? this.width : rx;
-        var ry = y - this.y;
-        ry = ry > 0 ? ry : 0;
-        ry = rx - this.height > 0 ? this.height : ry;
-        return new Laya.Point(rx, ry);
     };
     // Path操作
     Maze.prototype.ClearPathData = function () {
@@ -120,19 +133,19 @@ var Maze = /** @class */ (function (_super) {
         var mwClr = color || Maze.mzWallColor;
         if (w == 0) {
             //画左边的墙
-            this.graphics.drawLine(c * cW, r * cH, c * cW, (r + 1) * cH, mwClr, wWidth);
+            this.staticCanvas.graphics.drawLine(c * cW, r * cH, c * cW, (r + 1) * cH, mwClr, wWidth);
         }
         if (w == 1) {
             //画上边的墙
-            this.graphics.drawLine(c * cW, r * cH, (c + 1) * cW, r * cH, mwClr, wWidth);
+            this.staticCanvas.graphics.drawLine(c * cW, r * cH, (c + 1) * cW, r * cH, mwClr, wWidth);
         }
         if (w == 2) {
             //画右边的墙
-            this.graphics.drawLine((c + 1) * cW, r * cH, (c + 1) * cW, (r + 1) * cH, mwClr, wWidth);
+            this.staticCanvas.graphics.drawLine((c + 1) * cW, r * cH, (c + 1) * cW, (r + 1) * cH, mwClr, wWidth);
         }
         if (w == 3) {
             //画下边的墙
-            this.graphics.drawLine(c * cW, (r + 1) * cH, (c + 1) * cW, (r + 1) * cH, mwClr, wWidth);
+            this.staticCanvas.graphics.drawLine(c * cW, (r + 1) * cH, (c + 1) * cW, (r + 1) * cH, mwClr, wWidth);
         }
     };
     //给墙的缝隙画上
@@ -142,20 +155,20 @@ var Maze = /** @class */ (function (_super) {
         var mwClr = Maze.mzWallColor;
         var mwWidth = Maze.mzWallWidth;
         if (w == 0) {
-            this.graphics.drawCircle(c * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
-            this.graphics.drawCircle(c * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.staticCanvas.graphics.drawCircle(c * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.staticCanvas.graphics.drawCircle(c * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
         }
         if (w == 1) {
-            this.graphics.drawCircle(c * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
-            this.graphics.drawCircle((c + 1) * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.staticCanvas.graphics.drawCircle(c * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.staticCanvas.graphics.drawCircle((c + 1) * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
         }
         if (w == 2) {
-            this.graphics.drawCircle((c + 1) * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
-            this.graphics.drawCircle((c + 1) * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.staticCanvas.graphics.drawCircle((c + 1) * cW, r * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.staticCanvas.graphics.drawCircle((c + 1) * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
         }
         if (w == 3) {
-            this.graphics.drawCircle(c * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
-            this.graphics.drawCircle((c + 1) * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.staticCanvas.graphics.drawCircle(c * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
+            this.staticCanvas.graphics.drawCircle((c + 1) * cW, (r + 1) * cH, mwWidth / 2 + 2, mwClr, mwClr, 1);
         }
     };
     Maze.prototype.DrawPathByCell = function (cell) {

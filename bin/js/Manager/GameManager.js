@@ -15,9 +15,10 @@ var InitState = /** @class */ (function () {
     };
     InitState.prototype.update = function () {
         this.counter++;
-        this.gameView.SetTimer(this.counter);
+        this.gameView.SetTitle(this.counter.toString());
         if (this.counter > 200) {
             console.log("InitState  change to InGameState!");
+            this.gameView.SetTitle("In Game!");
             GameManager.Instance.SwitchState(StateType.InGame);
         }
     };
@@ -35,14 +36,18 @@ var InGameState = /** @class */ (function () {
     };
     InGameState.prototype.update = function () {
         var nextCell = this.gameView.curMaze.ShiftFirstPathCell();
+        var curCell = this.gameView.ownerPlayer.GetCurCell();
         if (nextCell != null) {
-            var curCell = this.gameView.ownerPlayer.GetCurCell();
             if (!curCell.Equal(nextCell)) {
                 this.gameView.ownerPlayer.SetCurCell(nextCell);
-                var pos = this.gameView.curMaze.CellToPos(nextCell);
+                var mzPos = this.gameView.curMaze.CellToMazePos(nextCell);
+                var pos = this.gameView.curMaze.MazePosToPos(mzPos.x, mzPos.y);
                 Laya.Tween.to(this.gameView.ownerPlayer, { x: pos.x, y: pos.y }, 200);
-                Laya.Tween.to(this.gameView.light, { x: pos.x, y: pos.y }, 200);
+                Laya.Tween.to(this.gameView.light, { x: mzPos.x, y: mzPos.y }, 200);
             }
+        }
+        if (curCell.col == 0 && curCell.row == 0) {
+            GameManager.Instance.SwitchState(StateType.End);
         }
     };
     InGameState.prototype.exit = function () {
@@ -50,12 +55,28 @@ var InGameState = /** @class */ (function () {
     };
     return InGameState;
 }());
+var EndGameState = /** @class */ (function () {
+    function EndGameState(gv) {
+        this.gameView = gv;
+    }
+    EndGameState.prototype.enter = function () {
+        this.gameView.SetTitle("Success!");
+        console.log("EndGameState  enter!");
+    };
+    EndGameState.prototype.update = function () {
+    };
+    EndGameState.prototype.exit = function () {
+        console.log("EndGameState  exit!");
+    };
+    return EndGameState;
+}());
 var GameManager = /** @class */ (function () {
     function GameManager(gv) {
         this.stateMap = [];
         GameManager.Instance = this;
         this.stateMap[StateType.Init] = new InitState(gv);
         this.stateMap[StateType.InGame] = new InGameState(gv);
+        this.stateMap[StateType.End] = new EndGameState(gv);
     }
     GameManager.prototype.CurState = function () {
         return this.curState;

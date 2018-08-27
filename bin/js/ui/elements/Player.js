@@ -18,24 +18,24 @@ var Player = /** @class */ (function (_super) {
         _this.maze = maze;
         _this.data = new PlayerData(cell && cell.col || c, cell && cell.row || r);
         _this.loadImage(ResourceManager.PlBgUrl);
-        _this.maze.addChild(_this);
         _this.pivot(_this.width * 0.5, _this.height * 0.5).scale(0.5, 0.5);
-        _this.RefreshMazePos();
+        _this.RefreshPlayerPos();
         return _this;
     }
-    Player.prototype.RefreshMazePos = function () {
-        var pos = this.maze.CellToPos(this.data.mazePos);
+    Player.prototype.RefreshPlayerPos = function () {
+        var mzPos = this.maze.CellToMazePos(this.data.playerCell);
+        var pos = this.maze.MazePosToPos(mzPos.x, mzPos.y);
         this.pos(pos.x, pos.y);
     };
     Player.prototype.SetCurCellByParams = function (c, r) {
-        this.data.mazePos.col = c || 0;
-        this.data.mazePos.row = r || 0;
+        this.data.playerCell.col = c || 0;
+        this.data.playerCell.row = r || 0;
     };
     Player.prototype.SetCurCell = function (cell) {
-        this.data.mazePos = cell;
+        this.data.playerCell = cell;
     };
     Player.prototype.GetCurCell = function () {
-        return this.data.mazePos;
+        return this.data.playerCell;
     };
     return Player;
 }(Laya.Sprite));

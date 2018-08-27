@@ -9,27 +9,27 @@ class Player extends Laya.Sprite {
         this.data = new PlayerData(cell && cell.col || c, cell && cell.row || r);
 
         this.loadImage(ResourceManager.PlBgUrl);
-        this.maze.addChild(this);
 
         this.pivot(this.width * 0.5, this.height * 0.5).scale(0.5, 0.5);
-        this.RefreshMazePos();
+        this.RefreshPlayerPos();
     }
 
-    public RefreshMazePos() {
-        let pos = this.maze.CellToPos(this.data.mazePos);
+    public RefreshPlayerPos() {
+        let mzPos = this.maze.CellToMazePos(this.data.playerCell);
+        let pos = this.maze.MazePosToPos(mzPos.x,mzPos.y);
         this.pos(pos.x, pos.y);
     }
 
     public SetCurCellByParams(c, r) {
-        this.data.mazePos.col = c || 0;
-        this.data.mazePos.row = r || 0;
+        this.data.playerCell.col = c || 0;
+        this.data.playerCell.row = r || 0;
     }
 
     public SetCurCell(cell: MazeCell) {
-        this.data.mazePos = cell;
+        this.data.playerCell = cell;
     }
 
     public GetCurCell() {
-        return this.data.mazePos;
+        return this.data.playerCell;
     }
 }
